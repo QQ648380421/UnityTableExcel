@@ -1,0 +1,78 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1 &3532452184596089441
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 5013915648802758740}
+  - component: {fileID: 2551276925888448215}
+  m_Layer: 0
+  m_Name: CreateObjDataPrefab
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &5013915648802758740
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3532452184596089441}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: 0
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &2551276925888448215
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3532452184596089441}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e5841d0830661bc4b96b5708f3a4be60, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Datas:
+  - Prefab: {fileID: 2589351551349933856, guid: ab7dec0866420ec4d9e5f182ef2ace73,
+      type: 3}
+    Name: "\u7CFB\u7EDF\u98CE\u683C\u6309\u94AE"
+    Type: UI
+  - Prefab: {fileID: 1215114537556681718, guid: a9742340f738eb24ea893425a1ea8f6b,
+      type: 3}
+    Name: "\u7CFB\u7EDF\u98CE\u683C\u8F93\u5165\u6846"
+    Type: UI
+  - Prefab: {fileID: 8440342278173281703, guid: a0b10ca1e541e924c8e7a41125aea841,
+      type: 3}
+    Name: "\u7CFB\u7EDF\u53F3\u952E\u83DC\u5355"
+    Type: UI
+  - Prefab: {fileID: 6032374912671352465, guid: 8ee7bd507da57474d89d24bb6391f87a,
+      type: 3}
+    Name: "\u7CFB\u7EDF\u98CE\u683C\u8868\u5355"
+    Type: UI
+  - Prefab: {fileID: 5005853119230409482, guid: 00ab5c5a23b4d37438f2ad14086ff24c,
+      type: 3}
+    Name: "\u7CFB\u7EDF\u98CE\u683C\u6EDA\u52A8\u5BB9\u5668"
+    Type: UI
+  - Prefab: {fileID: 7699781702503531049, guid: 4c6fa7edd2db9b5489e8cbc1cceb3c6f,
+      type: 3}
+    Name: "\u9876\u90E8\u6309\u94AE\u63A7\u5236\u5668"
+    Type: UI
+  - Prefab: {fileID: 2727005008937473576, guid: 5ca9c6efafb704441a107c67d90f9d8b,
+      type: 3}
+    Name: "\u9876\u90E8\u6309\u94AE"
+    Type: UI
+  - Prefab: {fileID: 2490962228261105360, guid: 94b8bce24ef55324695400b644a5c893,
+      type: 3}
+    Name: "\u7CFB\u7EDF\u98CE\u683C\u7A97\u53E3"
+    Type: UI
