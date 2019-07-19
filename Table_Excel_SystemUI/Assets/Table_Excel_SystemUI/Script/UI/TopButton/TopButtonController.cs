@@ -12,8 +12,14 @@ namespace Xp_TopButton_V1
     /// </summary>
     public class TopButtonController : MonoBehaviour
     {
-        public List<TopButton> Buttons = new List<TopButton>();
+        [Header("启动时显示的按钮")]
+        public TopButton StartShowButton;
 
+        public List<TopButton> Buttons = new List<TopButton>();
+        private void Start()
+        {
+            ShowButton(StartShowButton);
+        }
         /// <summary>
         /// 显示按钮
         /// </summary>
