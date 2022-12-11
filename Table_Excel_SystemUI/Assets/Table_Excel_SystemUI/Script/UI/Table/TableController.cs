@@ -164,10 +164,8 @@ namespace Xp_Table_V1
                     } 
                     break;
                 case RigthMenu.删除列:
-                    foreach (var item in SelectCells)
-                    {
-                        RemoveColumn(item.Data);
-                    }
+                   var _cell= SelectCells.FirstOrDefault();
+                    RemoveColumn(_cell.Data);
                     break;
                 case RigthMenu.合并单元格:
                     MergeSelectCell();

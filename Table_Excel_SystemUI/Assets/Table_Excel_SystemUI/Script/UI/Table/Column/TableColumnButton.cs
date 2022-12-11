@@ -7,6 +7,7 @@ using Xp_ListEvent;
 using System;
 using UnityEngine.UI;
 using ColumnData = Xp_Table_V1.TableColumnController.ColumnData;
+using System.Linq;
 
 namespace Xp_Table_V1
 {
@@ -58,8 +59,10 @@ namespace Xp_Table_V1
             Button.onClick.RemoveAllListeners();
             Button.onClick.AddListener(() => {
                 value.TableController.SelectCells.Clear();
-                foreach (var item in value.CellDatas)
-                {//如果选择了这个按钮，那么关联的所有单元格都被选中 
+                 
+                var _cells = value.TableController.Data.CellDatas.Where(p => p.ColumnIndex == value.ColumnIndex);
+                foreach (var item in _cells)
+                {//如果选择了这个按钮，那么关联的所有单元格都被选中  
                     value.TableController.SelectCells.Add(item.TableCell);
                 }
             });
