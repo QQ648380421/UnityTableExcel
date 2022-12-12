@@ -1,11 +1,14 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.Linq;
+using UnityEngine.UI;
+using static XP.TableModel.Cell;
+
 namespace XP.TableModel
-{ 
+{
+
     /// <summary>
     /// 表格
     /// </summary>
@@ -14,23 +17,43 @@ namespace XP.TableModel
         /// <summary>
         /// 单元格数据
         /// </summary>
-        public readonly ObservableCollection<CellData> _CellDatas = new ObservableCollection<CellData>();
+        public readonly CellDataCollection _CellDatas = new CellDataCollection();
         /// <summary>
         /// 最大行索引
         /// </summary>
         int _MaxRowIndex {
             get {
-              return  _CellDatas.Max(p=>p._Row);
+                return _CellDatas._MaxRowIndex;
             }
         }
         /// <summary>
         /// 最大列索引
         /// </summary>
-        int _MaxColumIndex
+        int _MaxColumnIndex
         {
             get
             {
-                return _CellDatas.Max(p => p._Colum);
+                return _CellDatas._MaxColumnIndex;
+            }
+        }
+
+        ScrollRect scrollRect;
+        /// <summary>
+        /// 滚动容器组件
+        /// </summary>
+        public ScrollRect _ScrollRect { get {
+                if (!scrollRect)
+                {
+                    scrollRect = GetComponent<ScrollRect>();
+                }
+                return scrollRect;
+            }   }
+        /// <summary>
+        /// 单元格滚动容器
+        /// </summary>
+        public RectTransform _CellContent {
+            get {
+                return _ScrollRect.content;
             }
         }
         /// <summary>
@@ -40,19 +63,78 @@ namespace XP.TableModel
         /// <summary>
         /// 单元格容器
         /// </summary>
-        public Transform _CellView;
+        public CellView _CellView;
         /// <summary>
         /// 所有实例单元格
         /// </summary>
         public readonly List<Cell> _Cells = new List<Cell>();
+        [SerializeField]
+        private bool lockHeaderColumnCells = true;
+        /// <summary>
+        /// 锁定表头列
+        /// </summary>
+        public bool _LockHeaderColumnCells { get => lockHeaderColumnCells; set => lockHeaderColumnCells = value; }
+
+        [SerializeField]
+        private bool lockHeaderRowCells = true;
+        /// <summary>
+        /// 锁定表头行
+        /// </summary>
+        public bool _LockHeaderRowCells { get => lockHeaderRowCells; set => lockHeaderRowCells = value; }
+       
+        Cell this[int column,int row] {
+            get {
+                return _Cells.FirstOrDefault(p=>p!=null &&p._CellData._Column==column && p._CellData._Row==row);
+            }
+        }
+        Cell this[CellData cellData]
+        {
+            get
+            {
+                return _Cells.FirstOrDefault(p => p != null && p._CellData._Column == cellData._Column && p._CellData._Row == cellData._Row);
+            }
+        }
+        /// <summary>
+        /// 获取行所有单元格
+        /// </summary>
+        /// <param name="row"></param>
+        /// <returns></returns>
+        public IEnumerable<Cell> _GetRowCells(int row) {
+          return  _Cells.Where(p=>p._CellData._Row== row);
+        }
+        /// <summary>
+        /// 获取列所有单元格
+        /// </summary>
+        /// <param name="row"></param>
+        /// <returns></returns>
+        public IEnumerable<Cell> _GetColumCells(int colum)
+        {
+            return _Cells.Where(p => p._CellData._Column == colum);
+        }
+
+        /// <summary>
+        /// 表头控制器
+        /// </summary>
+        public HeaderColumn _HeaderColumn;
 
         private void Awake()
-        {
-          
+        { 
             _CellDatas.CollectionChanged -= _CellDatas_CollectionChanged;
             _CellDatas.CollectionChanged += _CellDatas_CollectionChanged;
         }
 
+        private void Start()
+        {
+            for (int i = 0; i < 10; i++)
+            {
+                _AddColumn(new HeaderColumnCell.ColumnCellData() { 
+                 _Name="列"+i,
+                  _Column=0,
+                   Width=300
+                });
+            }
+           
+        }
         /// <summary>
         /// 当单元格列表发生变化时触发
         /// </summary>
@@ -60,34 +142,38 @@ namespace XP.TableModel
         /// <param name="e"></param>
         private void _CellDatas_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
         {
+            Debug.Log(e.Action + ":" + e.NewStartingIndex + " old:" + e.OldStartingIndex);
+
+            CellData _changeCelll = null;
             switch (e.Action)
             {
                 case NotifyCollectionChangedAction.Add:
-                  var _newCell=  Instantiate(_CellPrefab, _CellView);
-                    _newCell._CellData = _CellDatas[e.NewStartingIndex];
+                    //检查有没有重复添加的 
+                    _changeCelll = e.NewItems[0] as CellData; 
+                    var _newCell = GameObject.Instantiate(_CellPrefab, _CellView.transform);
+                    _newCell._CellData = _changeCelll;
                     _Cells.Add(_newCell);
                     break;
                 case NotifyCollectionChangedAction.Move:
                     break;
                 case NotifyCollectionChangedAction.Remove:
+                    _changeCelll = e.OldItems[0] as CellData;
+                    if (_changeCelll != null && _changeCelll._Cell)
+                    {
+                        _Cells.Remove(_changeCelll._Cell);
+                        Destroy(_changeCelll._Cell.gameObject);
+                    } 
                     break;
                 case NotifyCollectionChangedAction.Replace:
+
                     break;
                 case NotifyCollectionChangedAction.Reset:
+
                     break;
                 default:
                     break;
             }
 
-        }
-
-        // Start is called before the first frame update
-        void Start()
-        {
-            _CellDatas.Add(new CellData() { 
-             _Data="你好"
-            });
-            
         }
 
         /// <summary>
@@ -97,16 +183,41 @@ namespace XP.TableModel
           var _maxIndex= _MaxRowIndex+1;
             for (int i = 0; i < columCount; i++)
             {
-                _CellDatas.Add(new CellData()
-                {
-                    _Data = "Cell("+i+","+ _maxIndex + ")",
-                    _Row = _maxIndex,
-                    _Colum=i
-                });
+                _CellDatas.Add(new CellData("Cell\n" + i + "," + _maxIndex, _maxIndex,i));
             }
           
         }
-      
-         
+
+        /// <summary>
+        /// 添加一列
+        /// </summary>
+        /// <param name="columnCellData"></param>
+        public void _AddColumn(HeaderColumnCell.ColumnCellData columnCellData) {
+            _HeaderColumn._AddColumn(columnCellData);
+
+        }
+        /// <summary>
+        /// 删除行
+        /// </summary>
+        /// <param name="row"></param>
+        public void _RemoveRow(int row)
+        {
+            _CellDatas._RemoveRow(row);
+        }
+
+        /// <summary>
+        /// 删除列
+        /// </summary>
+        /// <param name="row"></param>
+        public void _RemoveColum(int colum)
+        {
+            _CellDatas._RemoveColumn(colum);
+        }
+        /// <summary>
+        /// 刷新表
+        /// </summary>
+        public void _Refresh() { 
+        
+        }
     }
 }

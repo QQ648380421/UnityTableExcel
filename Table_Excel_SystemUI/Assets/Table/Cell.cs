@@ -2,12 +2,20 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine.UI;
 using UnityEngine;
+using static XP.TableModel.Cell;
+using UnityEngine.Events;
+using System;
+
 namespace XP.TableModel
 {
+    [Serializable]
+    public class CellDataEvent : UnityEvent<object> { }
+    public delegate void _CellDataChanged(Cell _cell, CellData _cellData);
+
     /// <summary>
     /// 单元格
     /// </summary>
-    public class Cell : Selectable
+    public partial class Cell : Selectable
     {
         /// <summary>
         /// 用来方便调试查看的数据
@@ -23,7 +31,13 @@ namespace XP.TableModel
                 cellData = value;
                 value._Cell = this;
                 _Invoke__CellDataChangeEvent(this, value); 
-                _CellDataChangedEvents?.Invoke(value); 
+                _CellDataChangedEvents?.Invoke(value);
+                string dataStr = string.Empty;
+                if (value._Data!=null)
+                {
+                    dataStr = value._Data.ToString();
+                }
+                _CellDataChangedEvents_String?.Invoke(dataStr);
             }  }
 
         /// <summary>
