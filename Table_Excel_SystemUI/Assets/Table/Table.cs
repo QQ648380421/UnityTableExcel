@@ -81,7 +81,15 @@ namespace XP.TableModel
         /// 锁定表头行
         /// </summary>
         public bool _LockHeaderRowCells { get => lockHeaderRowCells; set => lockHeaderRowCells = value; }
-       
+         /// <summary>
+        /// 表头控制器
+        /// </summary>
+        public HeaderColumn _HeaderColumn;
+        /// <summary>
+        /// 表头控制器
+        /// </summary>
+        public HeaderRow _HeaderRow;
+
         Cell this[int column,int row] {
             get {
                 return _Cells.FirstOrDefault(p=>p!=null &&p._CellData._Column==column && p._CellData._Row==row);
@@ -112,10 +120,7 @@ namespace XP.TableModel
             return _Cells.Where(p => p._CellData._Column == colum);
         }
 
-        /// <summary>
-        /// 表头控制器
-        /// </summary>
-        public HeaderColumn _HeaderColumn;
+
 
         private void Awake()
         { 
@@ -127,10 +132,20 @@ namespace XP.TableModel
         {
             for (int i = 0; i < 10; i++)
             {
-                _AddColumn(new HeaderColumnCell.ColumnCellData() { 
-                 _Name="列"+i,
-                  _Column=0,
-                   Width=300
+                _AddColumn(new HeaderCellData() { 
+                 _Name="Column"+i,
+                  _Index=i,
+                   Width=300,
+                    Higth=50
+                });
+            }
+            for (int i = 0; i < 20; i++)
+            {
+                _AddRow(new HeaderCellData() { 
+                 _Name="Row"+i,
+                  _Index=i,
+                   Width=300,
+                   Higth=50
                 });
             }
            
@@ -141,61 +156,41 @@ namespace XP.TableModel
         /// <param name="sender"></param>
         /// <param name="e"></param>
         private void _CellDatas_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
-        {
-            Debug.Log(e.Action + ":" + e.NewStartingIndex + " old:" + e.OldStartingIndex);
-
-            CellData _changeCelll = null;
+        { 
             switch (e.Action)
             {
-                case NotifyCollectionChangedAction.Add:
-                    //检查有没有重复添加的 
-                    _changeCelll = e.NewItems[0] as CellData; 
-                    var _newCell = GameObject.Instantiate(_CellPrefab, _CellView.transform);
-                    _newCell._CellData = _changeCelll;
-                    _Cells.Add(_newCell);
+                case NotifyCollectionChangedAction.Add: 
                     break;
                 case NotifyCollectionChangedAction.Move:
                     break;
-                case NotifyCollectionChangedAction.Remove:
-                    _changeCelll = e.OldItems[0] as CellData;
-                    if (_changeCelll != null && _changeCelll._Cell)
-                    {
-                        _Cells.Remove(_changeCelll._Cell);
-                        Destroy(_changeCelll._Cell.gameObject);
-                    } 
+                case NotifyCollectionChangedAction.Remove: 
                     break;
-                case NotifyCollectionChangedAction.Replace:
-
+                case NotifyCollectionChangedAction.Replace: 
                     break;
-                case NotifyCollectionChangedAction.Reset:
-
+                case NotifyCollectionChangedAction.Reset: 
                     break;
                 default:
                     break;
             }
 
         }
-
-        /// <summary>
-        /// 添加一行新数据
-        /// </summary>
-        public void _AddNewRow(int columCount) {
-          var _maxIndex= _MaxRowIndex+1;
-            for (int i = 0; i < columCount; i++)
-            {
-                _CellDatas.Add(new CellData("Cell\n" + i + "," + _maxIndex, _maxIndex,i));
-            }
-          
-        }
-
+         
         /// <summary>
         /// 添加一列
         /// </summary>
         /// <param name="columnCellData"></param>
-        public void _AddColumn(HeaderColumnCell.ColumnCellData columnCellData) {
-            _HeaderColumn._AddColumn(columnCellData);
-
+        public void _AddColumn(HeaderCellData   headerCellData) {
+            _HeaderColumn._Add(headerCellData);  
         }
+        /// <summary>
+        /// 添加一行
+        /// </summary>
+        /// <param name="columnCellData"></param>
+        public void _AddRow(HeaderCellData headerCellData)
+        {
+            _HeaderRow._Add(headerCellData);
+        }
+
         /// <summary>
         /// 删除行
         /// </summary>
@@ -216,8 +211,18 @@ namespace XP.TableModel
         /// <summary>
         /// 刷新表
         /// </summary>
-        public void _Refresh() { 
-        
+        public virtual void _Refresh() {
+            _ScrollRect.verticalScrollbar.value = 0;
+            _ScrollRect.horizontalScrollbar.value = 0;
+        }
+
+
+        private void Update()
+        {
+            if (Input.GetKeyDown( KeyCode.Space))
+            {
+                _Refresh();
+            }
         }
     }
 }
