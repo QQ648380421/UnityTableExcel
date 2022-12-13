@@ -27,6 +27,7 @@ namespace XP.TableModel
             var __cellContentSize = _Table._CellContent.sizeDelta;
             __cellContentSize.y= _RectTransform.sizeDelta.y;
             _Table._CellContent.sizeDelta = __cellContentSize;
+            _Invoke_RectSizeChangedEvent();
         }
         public override void _ResetCellContentSize()
         {

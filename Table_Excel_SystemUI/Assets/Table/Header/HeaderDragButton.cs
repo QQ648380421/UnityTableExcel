@@ -13,18 +13,8 @@ namespace XP.TableModel {
         /// <summary>
         /// 开始拖拽和结束拖拽事件
         /// </summary>
-        public event EventHandler<PointerEventData> _OnBeginDragEvent,_OnEndDragEvent;
-        /// <summary>
-        /// 拖拽委托
-        /// </summary>
-        /// <param name="originPos">原坐标</param>
-        /// <param name="newPos">新坐标</param>
-        public delegate void _DragDelegate(HeaderDragButton headerDragButton, Vector2 buttonSize);
-        /// <summary>
-        /// 拖拽事件
-        /// </summary>
-        public event _DragDelegate _OnDragEvent;
- 
+        public event EventHandler<PointerEventData> _OnBeginDragEvent,_OnEndDragEvent, _OnDragEvent;
+         
         /// <summary>
         /// 控制大小的变换组件
         /// </summary>
@@ -48,9 +38,8 @@ namespace XP.TableModel {
         }
 
         public virtual void OnDrag(PointerEventData eventData)
-        {
-         
-           var size= _ControllerSizeRect.sizeDelta;
+        { 
+            var size = _ControllerSizeRect.sizeDelta;
             switch (_DragDirection)
             {
                 case DragDirectionEnum.x:
@@ -62,8 +51,8 @@ namespace XP.TableModel {
                 default:
                     break;
             }
-            _ControllerSizeRect.sizeDelta = size; 
-            _OnDragEvent?.Invoke(this, _ControllerSizeRect.sizeDelta);
+            _ControllerSizeRect.sizeDelta = size;
+            _OnDragEvent?.Invoke(this,eventData);
         }
 
         public virtual void OnEndDrag(PointerEventData eventData)

@@ -24,7 +24,8 @@ namespace XP.TableModel
             yield return new WaitForEndOfFrame();
             var __cellContentSize = _Table._CellContent.sizeDelta;
             __cellContentSize.x = _RectTransform.sizeDelta.x;
-            _Table._CellContent.sizeDelta = __cellContentSize; 
+            _Table._CellContent.sizeDelta = __cellContentSize;
+            _Invoke_RectSizeChangedEvent();
         } 
         public override void _ResetCellContentSize()
         {

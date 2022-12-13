@@ -28,6 +28,19 @@ namespace XP.TableModel
                 return table;
             } }
 
+        RectTransform rectTransform;
+        public RectTransform _RectTransform
+        {
+            get
+            {
+                if (!rectTransform)
+                {
+                    rectTransform = transform as RectTransform ;
+                }
+                return rectTransform;
+            } 
+        }
+
         /// <summary>
         /// 列遮罩
         /// </summary>
@@ -58,14 +71,14 @@ namespace XP.TableModel
                 item._OnDragEvent += Item__OnDragEvent;
             }
         }
-      private void Item__OnBeginDragEvent(object sender, PointerEventData e)
+        private void Item__OnBeginDragEvent(object sender, PointerEventData e)
         {
-         
+
         }
 
         private void Item__OnEndDragEvent(object sender, PointerEventData e)
         {
-        
+            Item__OnDragEvent(sender,e);
         }
 
      
@@ -79,9 +92,16 @@ namespace XP.TableModel
                 item._OnDragEvent -= Item__OnDragEvent; 
             }
         } 
-        private void Item__OnDragEvent(HeaderDragButton headerDragButton, Vector2 buttonSize)
-        { 
-            switch (headerDragButton._DragDirection)
+        /// <summary>
+        /// 拖拽按钮拖拽事件
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void Item__OnDragEvent(object sender, PointerEventData e)
+        {
+            var _dragButton= sender as HeaderDragButton;
+            var buttonSize = _RectTransform.sizeDelta;
+            switch (_dragButton._DragDirection)
             {
                 case HeaderDragButton.DragDirectionEnum.x:
                     //设置遮罩位置

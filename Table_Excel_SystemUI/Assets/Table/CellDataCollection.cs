@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
+using UnityEngine;
 using static XP.TableModel.Cell;
 
 namespace XP.TableModel
@@ -16,6 +17,20 @@ namespace XP.TableModel
             }
         }
 
+        public CellData this[int x ,int y ]
+        {
+            get
+            {
+                return this.FirstOrDefault(p => p != null && p._Column == x && p._Row ==y);
+            }
+        }
+        public CellData this[Vector2Int vector2]
+        {
+            get
+            {
+                return this[vector2.x, vector2.y];
+            }
+        }
         /// <summary>
         /// 获取行所有单元格数据
         /// </summary>

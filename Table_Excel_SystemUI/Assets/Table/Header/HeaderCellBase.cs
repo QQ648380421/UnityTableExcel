@@ -7,11 +7,16 @@ using static XP.TableModel.HeaderColumnCell;
 namespace XP.TableModel
 {
     public delegate void _CellDataChangeDelegate(HeaderCellBase cell, HeaderCellData columnCellData);
-
+    /// <summary>
+    /// 是否处于边界内委托
+    /// </summary>
+    /// <param name="cell">单元格</param>
+    /// <param name="isInsideBoundary">是否处于边界内</param>
+    public delegate void _IsInsideBoundaryChangeDelegate(HeaderCellBase cell, bool isInsideBoundary);
     /// <summary>
     /// 表头单元格基类
     /// </summary>
-    public  partial class HeaderCellBase : Button
+    public abstract  class HeaderCellBase : Button
     {
         [Header("当列名发生变化时触发")]
         public InputField.OnChangeEvent _OnCellNameChanged;
@@ -32,28 +37,28 @@ namespace XP.TableModel
         {
             get => cellData; set
             {
-                if (cellData == value) return; 
+                if (cellData == value) return;
                 if (cellData != null)
                 {
                     cellData.PropertyChanged -= _CellData_PropertyChanged;
                 }
                 cellData = value;
-                if (cellData!=null)
+                if (cellData != null)
                 {
                     cellData.PropertyChanged -= _CellData_PropertyChanged;
                     cellData.PropertyChanged += _CellData_PropertyChanged;
                     transform.SetSiblingIndex(cellData._Index);
-                } 
+                }
                 _OnCellDataChangeEvent?.Invoke(this, value);
-                if (value==null)
+                if (value == null)
                 {
                     _OnCellNameChanged?.Invoke(string.Empty);
                 }
                 else
                 {
-                    _OnCellNameChanged?.Invoke(value._Name); 
+                    _OnCellNameChanged?.Invoke(value._Name);
                 }
-           
+
             }
         }
         /// <summary>
@@ -62,13 +67,71 @@ namespace XP.TableModel
         public HeaderBase _HeaderBase { get {
                 if (!headerBase)
                 {
-                    headerBase = GetComponentInParent<HeaderBase>(); 
+                    headerBase = GetComponentInParent<HeaderBase>();
                 }
                 return headerBase;
             } }
 
         HeaderBase headerBase;
 
+        RectTransform rectTransform;
+        public RectTransform _RectTransform
+        {
+            get
+            {
+                if (!rectTransform)
+                {
+                    rectTransform = transform as RectTransform;
+                }
+                return rectTransform;
+            } 
+        }
+
+
+        Mask parentMask;
+        /// <summary>
+        /// 父对象遮罩
+        /// </summary>
+        protected Mask _ParentMask
+        {
+            get
+            {
+                if (!parentMask)
+                {
+                    parentMask = GetComponentInParent<Mask>();
+                }
+                return parentMask;
+            } 
+        }
+
+        /// <summary>
+        /// 是否在显示范围边界内状态改变时触发
+        /// </summary>
+        public event _IsInsideBoundaryChangeDelegate _IsInsideBoundaryChangedEvent;
+
+        bool isInsideBoundary;
+        /// <summary>
+        /// 该单元格是否在边界内，每一帧刷新一次
+        /// </summary>
+        public bool _IsInsideBoundary
+        {
+            get
+            {
+                return isInsideBoundary;
+            }
+            set
+            {
+                if (isInsideBoundary == value) return;
+                isInsideBoundary = value;
+                _IsInsideBoundaryChangedEvent?.Invoke(this,value);
+            }
+        }
+
+        /// <summary>
+        /// 该单元格是否处于边界内
+        /// </summary>
+        public abstract bool InsideBoundary();
+         
         /// <summary>
         /// 数据发生变化时触发
         /// </summary>
@@ -77,8 +140,8 @@ namespace XP.TableModel
         private void _CellData_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
         {
             if (_CellData == null) return;
-            
-            if ( e.PropertyName == nameof(HeaderCellData._Name))
+
+            if (e.PropertyName == nameof(HeaderCellData._Name))
             {
                 _OnCellNameChanged?.Invoke(_CellData._Name);
             }
@@ -95,7 +158,7 @@ namespace XP.TableModel
             _DragButton._OnEndDragEvent -= _DragButton__OnEndDragEvent;
             _DragButton._OnEndDragEvent += _DragButton__OnEndDragEvent;
         }
-         protected override void OnDestroy()
+        protected override void OnDestroy()
         {
             base.OnDestroy();
             if (cellData != null)
@@ -104,7 +167,7 @@ namespace XP.TableModel
             }
             if (_DragButton)
             {
-                _DragButton._OnEndDragEvent -= _DragButton__OnEndDragEvent; 
+                _DragButton._OnEndDragEvent -= _DragButton__OnEndDragEvent;
             }
         }
 
@@ -116,5 +179,12 @@ namespace XP.TableModel
         protected void _DragButton__OnEndDragEvent(object sender, UnityEngine.EventSystems.PointerEventData e) {
             _HeaderBase._ResetCellContentSize();
         }
+
+        private void Update()
+        {
+            _IsInsideBoundary = InsideBoundary();
+
+        }
+
     }
 }

@@ -8,7 +8,7 @@ using static XP.TableModel.Cell;
 
 namespace XP.TableModel
 {
-
+    //备忘录：添加一列或者添加一行，要同步向cellData里添加同样多的数据缓冲区
     /// <summary>
     /// 表格
     /// </summary>
@@ -217,12 +217,12 @@ namespace XP.TableModel
         }
 
 
-        private void Update()
-        {
-            if (Input.GetKeyDown( KeyCode.Space))
-            {
-                _Refresh();
-            }
-        }
+        //private void Update()
+        //{
+        //    if (Input.GetKeyDown( KeyCode.Space))
+        //    {
+        //        _Refresh();
+        //    }
+        //}
     }
 }
