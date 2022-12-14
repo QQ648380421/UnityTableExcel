@@ -7,7 +7,7 @@ namespace XP.TableModel
 {
     [CustomEditor(typeof(HeaderButton),true)]
     [CanEditMultipleObjects]
-    public class HeaderButtonEditor : ButtonEditor
+    public class HeaderButtonEditor : ToggleEditor
     {
         SerializedProperty _HeaderColumnMask_Property;
         SerializedProperty _HeaderRowMask_Property;

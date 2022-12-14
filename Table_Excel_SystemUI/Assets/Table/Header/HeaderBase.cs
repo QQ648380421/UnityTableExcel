@@ -52,9 +52,12 @@ namespace XP.TableModel
         public event Action _OnRectSizeChangedEvent;
         /// <summary>
         /// 所有表头单元格实例
-        /// </summary>
-
+        /// </summary> 
         public readonly ObservableCollection<HeaderCellBase> _HeaderCells = new ObservableCollection<HeaderCellBase>();
+        /// <summary>
+        /// 当前选中表头单元格集合
+        /// </summary>
+        public readonly ObservableCollection<HeaderCellBase> _CurrentSelectHeaderCells = new ObservableCollection<HeaderCellBase>();
 
         /// <summary>
         /// 边界内的单元格数量
@@ -124,7 +127,28 @@ namespace XP.TableModel
             Unit._AddComponent<ToggleGroup>(this.gameObject).allowSwitchOff=true;
         }
         public abstract void _ScrollRectValueChanged(Vector2 vector2);
-         
+        /// <summary>
+        /// 当添加表头单元时创建单元格数据
+        /// 就是当创建表头的时候，要连单元格数据缓存也一起创建好
+        /// </summary>
+        public abstract void _OnAddHeaderCellCreateCellData(HeaderCellData headerCellData);
+        /// <summary>
+        /// 创建单元格数据
+        /// </summary>
+        protected virtual Cell.CellData _CreateCellData( Vector2Int indexV2) { 
+            var _findCellData = _Table._CellDatas[indexV2];
+            if (_findCellData == null)
+            {
+                _findCellData = new Cell.CellData()
+                {
+                    _Column = indexV2.x,
+                    _Row = indexV2.y,
+                    _Table=this._Table
+                };
+                _Table._CellDatas.Add(_findCellData);
+            }
+            return _findCellData;
+        }
         /// <summary>
         /// 添加单元格
         /// </summary>
@@ -135,6 +159,9 @@ namespace XP.TableModel
             var _newObj= Instantiate(_HeaderCellPrefab, _CreatePrefabView); 
             _newObj._CellData = cellData; 
             _HeaderCells.Add(_newObj);
+            _OnAddHeaderCellCreateCellData(cellData);
+         
+
             _ResetCellContentSize();
             return _newObj;
         }

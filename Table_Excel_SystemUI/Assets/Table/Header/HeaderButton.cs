@@ -8,7 +8,7 @@ namespace XP.TableModel
     /// <summary>
     /// 表头按钮
     /// </summary>
-    public class HeaderButton : Button
+    public class HeaderButton : Toggle
     {
         HeaderDragButton[] headerDragButtons;
 
@@ -70,7 +70,22 @@ namespace XP.TableModel
                 item._OnDragEvent -= Item__OnDragEvent;
                 item._OnDragEvent += Item__OnDragEvent;
             }
+            this.onValueChanged.AddListener(_IsOnValueChanged);
         }
+        /// <summary>
+        /// 选择框发生变化
+        /// </summary>
+        /// <param name="value"></param>
+        private void _IsOnValueChanged(bool value) {
+            foreach (var item in _Table._CellDatas)
+            {
+                if (item!=null)
+                {
+                    item._Selected = value; 
+                }
+            } 
+        }
+       
         private void Item__OnBeginDragEvent(object sender, PointerEventData e)
         {
 

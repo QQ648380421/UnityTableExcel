@@ -58,7 +58,67 @@ namespace XP.TableModel
             }
 
 
+            HeaderCellBase columnCell;
+            /// <summary>
+            ///关联列单元格
+            /// </summary>
+            public HeaderCellBase _ColumnCell
+            {
+                get
+                {
+                    return columnCell;
+                }
+                set
+                {
+                    if (columnCell == value) return;
+                    columnCell = value;
+                    _InvokePropertyChanged(nameof(_Cell));
+                }
+            }
 
+            HeaderCellBase rowCell;
+            public HeaderCellBase _RowCell
+            {
+                get
+                {
+                    return rowCell;
+                }
+                set
+                {
+                    if (rowCell == value) return;
+                    rowCell = value;
+                    _InvokePropertyChanged(nameof(_Cell));
+                }
+            }
+
+            public override bool _Selected { get => base._Selected; set { 
+                    base._Selected = value;
+                    if (!_Table) return;
+                    if (value)
+                    {
+                        if (!_Table._CurrentSelectedCellDatas.Contains(this))
+                        {
+                            _Table._CurrentSelectedCellDatas.Add(this);
+                        }
+                    }
+                    else
+                    {
+                        if (_Table._CurrentSelectedCellDatas.Contains(this))
+                        {
+                            _Table._CurrentSelectedCellDatas.Remove(this);
+                        } 
+                    }
+    
+                }  }
+            ~CellData() {
+                if (_Table)
+                {
+                    if (_Table._CellDatas.Contains(this))
+                    {
+                        _Table._CellDatas.Remove(this);
+                    } 
+                } 
+            }
         }
     }
 }

@@ -6,6 +6,7 @@ using static XP.TableModel.Cell;
 using UnityEngine.Events;
 using System;
 using System.Linq;
+using UnityEngine.EventSystems;
 
 namespace XP.TableModel
 {
@@ -23,27 +24,59 @@ namespace XP.TableModel
         /// </summary>
         [Header("DebugInfoData")]
         [SerializeField]
-        private CellData cellData; 
+        private CellData cellData;
+        /// <summary>
+        /// 数据中的内容发生变化
+        /// </summary>
+        private void _CellData_DataPropertyChanged() {
+            string dataStr = string.Empty;
+            if (cellData != null && cellData._Data != null)
+            {
+                dataStr = cellData._Data.ToString();
+            }
+            _CellDataChangedEvents_String?.Invoke(dataStr);
+        }
         /// <summary>
         /// 单元格数据
         /// </summary>
         public CellData _CellData { get => cellData; set {
                 if (cellData == value) return;
+                if (cellData!=null)
+                {
+                    cellData.PropertyChanged -= Value_PropertyChanged;
+                }
                 cellData = value;
                 _ClearIsInsideBoundaryChangedEvent(); 
                 _Invoke__CellDataChangeEvent(this, value); 
                 _CellDataChangedEvents?.Invoke(value);
-                string dataStr = string.Empty;
-                if (value!=null && value._Data!=null)
-                {
-                    dataStr = value._Data.ToString();
-                }
-                _CellDataChangedEvents_String?.Invoke(dataStr);
+                _CellData_DataPropertyChanged();
                 if (value == null) return;
-                value._Cell = this;
-                isOn = value._Selected;
+                value._Cell = this;   
+                SetIsOnWithoutNotify(value._Selected);//设置选择框状态
+                value.PropertyChanged -= Value_PropertyChanged;
+                value.PropertyChanged += Value_PropertyChanged;
+                name = value._Column+","+value._Row;
+
             }  }
-          
+
+        /// <summary>
+        /// 数据内部属性发生变化时触发
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void Value_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+        {
+            if (cellData == null) return;
+            if (e.PropertyName==nameof(CellData._Selected))
+            {//选中状态发生变化
+                SetIsOnWithoutNotify(cellData._Selected);//设置选择框状态 
+            }else
+            if (e.PropertyName == nameof(CellData._Data))
+            {//数据发生变化
+                _CellData_DataPropertyChanged();
+            }
+        }
+        
         CellView cellView;
         /// <summary>
         /// 单元格容器
@@ -64,7 +97,19 @@ namespace XP.TableModel
                 cellView = value;
             }
         }
+        public override void OnPointerClick(PointerEventData eventData)
+        {
+            base.OnPointerClick(eventData);
+            if (Input.GetKey(KeyCode.LeftControl) || Input.GetKey(KeyCode.RightCurlyBracket)) return;
+            foreach (var item in _Table._CellDatas)
+            {
+                if (item._Cell!=this)
+                {
+                    item._Selected = false;
+                }
+            }
 
+        }
 
         Table table;
         public Table _Table
@@ -97,6 +142,72 @@ namespace XP.TableModel
            
         }
   
+
+        /// <summary>
+        /// 行单元格发生变化
+        /// </summary>
+        public event _CellBaseChangedDelegate _RowCellChangedEvent;
+
+        HeaderBase column;
+        /// <summary>
+        /// 关联列
+        /// </summary>
+        public HeaderBase _Column
+        {
+            get
+            {
+                if (columnCell)
+                {
+                    return columnCell._HeaderBase;
+                }
+                return null;
+            } 
+        }
+
+
+        HeaderBase row;
+        /// <summary>
+        /// 关联行
+        /// </summary>
+        public HeaderBase _Row
+        {
+            get
+            {
+                if (rowCell)
+                {
+                    return rowCell._HeaderBase;
+                }
+                return null;
+            } 
+        }
+
+        HeaderCellBase columnCell;
+        /// <summary>
+        /// 关联列单元格
+        /// </summary>
+        public HeaderCellBase _ColumnCell
+        {
+            get
+            {
+                return columnCell;
+            }
+            set
+            {
+                if (columnCell == value) return;
+                if (columnCell)
+                { 
+                    columnCell._IsInsideBoundaryChangedEvent -= _ColumnAndRowCell__IsInsideBoundaryChangedEvent;
+                }
+                columnCell = value;
+                _UpdatePos();
+                _ColumnCellChangedEvent?.Invoke(this,value);
+                if (columnCell)
+                {
+                    columnCell._IsInsideBoundaryChangedEvent += _ColumnAndRowCell__IsInsideBoundaryChangedEvent; 
+                } 
+            }
+        }
+
         HeaderCellBase rowCell;
         /// <summary>
         /// 关联行单元格
@@ -116,45 +227,16 @@ namespace XP.TableModel
                 }
                 rowCell = value;
                 _UpdatePos();
-                _RowCellChangedEvent?.Invoke(this,value);
+                _RowCellChangedEvent?.Invoke(this, value);
                 if (rowCell)
                 {
                     rowCell._IsInsideBoundaryChangedEvent += _ColumnAndRowCell__IsInsideBoundaryChangedEvent;
                 }
-            }
-        }
-        /// <summary>
-        /// 行单元格发生变化
-        /// </summary>
-        public event _CellBaseChangedDelegate _RowCellChangedEvent;
 
-        HeaderCellBase columnCell;
-        /// <summary>
-        /// 关联列单元格
-        /// </summary>
-        public HeaderCellBase _ColumnCell
-        {
-            get
-            {
-                return columnCell;
-            }
-            set
-            {
-                if (columnCell == value) return;
-                if (columnCell)
-                {
-                    columnCell._IsInsideBoundaryChangedEvent -= _ColumnAndRowCell__IsInsideBoundaryChangedEvent;
-                }
-                columnCell = value;
-                _UpdatePos();
-                _ColumnCellChangedEvent?.Invoke(this,value);
-                if (columnCell)
-                {
-                    columnCell._IsInsideBoundaryChangedEvent += _ColumnAndRowCell__IsInsideBoundaryChangedEvent;
-                     
-                } 
             }
         }
+ 
+
         /// <summary>
         /// 列单元格发生变化
         /// </summary>
@@ -203,7 +285,7 @@ namespace XP.TableModel
         private void _ColumnAndRowCell__IsInsideBoundaryChangedEvent(HeaderCellBase cell, bool isInsideBoundary)
         {
             if (isInsideBoundary==false)
-            {
+            {//没销毁*********************** 
                 //销毁自己 
                 if (this)
                 {
@@ -243,20 +325,67 @@ namespace XP.TableModel
                 _Table._HeaderColumn._OnRectSizeChangedEvent += _Header__OnRectSizeChangedEvent;
                 _Table._HeaderRow._OnRectSizeChangedEvent += _Header__OnRectSizeChangedEvent;
                 _Table._OnRefreshEvent += _Table__OnRefreshEvent;
+                _Table._MultiSelectChangedEvent += _Table__MultiSelectChangedEvent;
+
+            }
+            this.onValueChanged.AddListener(_IsOnValueChanged); 
+        }
+        /// <summary>
+        /// 选中状态发生变化
+        /// </summary>
+        private void _IsOnValueChanged(bool value) { 
+            if (cellData == null) return;
+            cellData._Selected = value;
+            if (value)
+            {//选中表头单元格
+                if (_ColumnCell)
+                {
+                    _ColumnCell.SetIsOnWithoutNotify(value);
+                }
+                if (_RowCell)
+                {
+                    _RowCell.SetIsOnWithoutNotify(value);
+                }
+              
+            }
+         
+        }
+        /// <summary>
+        /// 允许多选发生变化
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void _Table__MultiSelectChangedEvent(object sender, bool e)
+        {
+            if (e)
+            {
+                group = null;
+            }
+            else
+            {
+                if (_CellView)
+                {
+                    group = _CellView._ToggleGroup;
+                } 
             }
            
         }
+
         /// <summary>
         /// 清除事件
         /// </summary>
         private void _ClearEvents()
-        {  
+        {
+        
             if (_Table)
             {
                 _Table._HeaderRow._OnRectSizeChangedEvent -= _Header__OnRectSizeChangedEvent;
                 _Table._HeaderColumn._OnRectSizeChangedEvent -= _Header__OnRectSizeChangedEvent;
-                _Table._OnRefreshEvent += _Table__OnRefreshEvent;
+                _Table._OnRefreshEvent -= _Table__OnRefreshEvent;
+                _Table._MultiSelectChangedEvent -= _Table__MultiSelectChangedEvent;
             }
+            this.onValueChanged.RemoveListener(_IsOnValueChanged); 
+      
         }
         /// <summary>
         /// 清理边界事件
@@ -309,8 +438,11 @@ namespace XP.TableModel
         private void _UpdateData() { 
              var _index= _Index();
             if (_Table)
-            {
+            { 
                 _CellData = _Table._CellDatas[_index];
+                _CellData._ColumnCell = _ColumnCell;
+                _CellData._RowCell = _RowCell;
+           
             }
         
         }
@@ -319,15 +451,22 @@ namespace XP.TableModel
             base.Start();
             _RegisterEvents();
             StartCoroutine(_YieldUpdatePos());
-            _UpdateData();
-            if (_CellView)
-            {
-                this.group = _CellView._ToggleGroup; 
-            }
-
+            if (_Table) _Table__MultiSelectChangedEvent(_Table, _Table._MultiSelect); 
+            _UpdateData(); 
         }
 
-
+        private void Update()
+        {
+            if (_ColumnCell)
+            {
+                _ColumnAndRowCell__IsInsideBoundaryChangedEvent(_ColumnCell, _ColumnCell._IsInsideBoundary);
+            }
+            if (_RowCell)
+            {
+                _ColumnAndRowCell__IsInsideBoundaryChangedEvent(_RowCell, _RowCell._IsInsideBoundary);
+            }
+    
+        }
         protected override void OnDestroy()
         {
             base.OnDestroy();
@@ -337,7 +476,11 @@ namespace XP.TableModel
             {
                 _CellView._Cells.Remove(this);
             }
-         
+            if (cellData != null)
+            {
+                cellData.PropertyChanged -= Value_PropertyChanged;
+            }
+            
         }
 
     }

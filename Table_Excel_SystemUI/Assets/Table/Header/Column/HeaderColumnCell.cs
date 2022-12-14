@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
@@ -39,6 +40,38 @@ namespace XP.TableModel
             }
             return false;
         }
-       
+
+        protected override void _IsOnChanged(bool value)
+        { 
+            if (_Table)
+            {
+                foreach (var item in _Table._CellDatas)
+                {
+                    item._Selected = false;
+                }
+                var _cellDatas = _Table._CellDatas._GetColumnCellsData(_CellData._Index);
+
+                if (_Table._MultiSelect)
+                {
+
+                    foreach (var item in _cellDatas)
+                    { 
+                        if (item._RowCell.isOn == true && value == false)
+                        {//如果有一边选中了，不能取消
+                            continue;
+                        }
+                        item._Selected = value;
+                    }
+                }
+                else
+                {
+                    var _cell = _cellDatas.OrderBy(p => p._Row).FirstOrDefault();
+                    if (_cell != null)
+                    {
+                        _cell._Selected = value;
+                    }
+                }
+            }
+        }
     }
 }

@@ -74,6 +74,21 @@ namespace XP.TableModel
 
         HeaderBase headerBase;
 
+
+        Table table;
+        public Table _Table
+        {
+            get
+            {
+                if (!table)
+                {
+                    table = _HeaderBase._Table;
+                }
+                return table;
+            }
+          
+        }
+
         RectTransform rectTransform;
         public RectTransform _RectTransform
         {
@@ -183,7 +198,40 @@ namespace XP.TableModel
             _DragButton.transform.SetSiblingIndex(transform.childCount);
             _DragButton._OnEndDragEvent -= _DragButton__OnEndDragEvent;
             _DragButton._OnEndDragEvent += _DragButton__OnEndDragEvent;
+            this.onValueChanged.AddListener(_IsOnChangedListener);
+
         }
+        /// <summary>
+        /// 选择框发生变化监听事件
+        /// </summary>
+        /// <param name="value"></param>
+        protected virtual void _IsOnChangedListener(bool value) {
+            if (_HeaderBase)
+            {
+                if (value)
+                {
+                    if (!_HeaderBase._CurrentSelectHeaderCells.Contains(this))
+                    {
+                        _HeaderBase._CurrentSelectHeaderCells.Add(this);
+                    }
+                }
+                else
+                {
+                    if (_HeaderBase._CurrentSelectHeaderCells.Contains(this))
+                    {
+                        _HeaderBase._CurrentSelectHeaderCells.Remove(this);
+                    }
+                }
+            }
+         
+            _IsOnChanged(value);
+        }
+        /// <summary>
+        /// 选择框发生变化
+        /// </summary>
+        /// <param name="value"></param>
+        protected abstract void _IsOnChanged(bool value);
+
         protected override void OnDestroy()
         {
             base.OnDestroy();
@@ -195,6 +243,14 @@ namespace XP.TableModel
             {
                 _DragButton._OnEndDragEvent -= _DragButton__OnEndDragEvent;
             }
+            if (_HeaderBase)
+            {
+                if (_HeaderBase._HeaderCells.Contains(this))
+                {
+                    _HeaderBase._HeaderCells.Remove(this);
+                } 
+            }
+       
         }
 
         /// <summary>

@@ -39,5 +39,16 @@ namespace XP.TableModel
             base.Reset();
             Unit._AddComponent<HorizontalLayoutGroup>(this.gameObject);
         }
+
+        public override void _OnAddHeaderCellCreateCellData(HeaderCellData headerCellData)
+        {
+            int columnCount = _Table._HeaderColumn._HeaderCellsCount;
+            for (int i = 0; i < columnCount; i++)
+            {
+                Vector2Int indexV2 = new Vector2Int(i,headerCellData._Index);
+                this._CreateCellData(indexV2);
+            }
+
+        }
     }
 }

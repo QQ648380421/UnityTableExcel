@@ -33,7 +33,7 @@ namespace XP.TableModel
             }
         }
 
-        private float width;
+        private float width=200;
         /// <summary>
         /// 高度
         /// </summary>
@@ -47,7 +47,7 @@ namespace XP.TableModel
             }
         }
 
-        private float higth;
+        private float higth=30;
           
 
     }

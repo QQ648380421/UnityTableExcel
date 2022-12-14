@@ -49,7 +49,7 @@ namespace XP.TableModel
         /// 单元格预制体
         /// </summary>
         public Cell _CellPrefab;
-
+   
         /// <summary>
         /// 注册事件
         /// </summary>
@@ -102,7 +102,7 @@ namespace XP.TableModel
             var _newCell = Instantiate(_CellPrefab, transform);
             _newCell._CellView = this;
             _newCell._RowCell = headerRowCell;
-            _newCell._ColumnCell = headerColumnCell;
+            _newCell._ColumnCell = headerColumnCell; 
             _Cells.Add(_newCell);
             return _newCell;
         }

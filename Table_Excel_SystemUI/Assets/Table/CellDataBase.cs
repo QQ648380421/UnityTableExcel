@@ -44,9 +44,28 @@ namespace XP.TableModel {
             {
                 if (selected == value) return;
                 selected = value;
-                _InvokePropertyChanged(nameof(_Selected));
+                _InvokePropertyChanged(nameof(_Selected)); 
             }
         }
 
+
+        Table table;
+        /// <summary>
+        /// ¹ØÁª±í
+        /// </summary>
+        public Table _Table
+        {
+            get
+            {
+                return table;
+            }
+            set
+            {
+                if (table == value) return;
+                table = value;
+                _InvokePropertyChanged(nameof(_Selected));
+            }
+        }
+         
     }
 }
