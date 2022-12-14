@@ -199,8 +199,20 @@ namespace XP.TableModel
             _DragButton._OnEndDragEvent -= _DragButton__OnEndDragEvent;
             _DragButton._OnEndDragEvent += _DragButton__OnEndDragEvent;
             this.onValueChanged.AddListener(_IsOnChangedListener);
+            _Table._OnRefreshEvent += _Table__OnRefreshEvent;
 
         }
+        
+        /// <summary>
+        /// 刷新
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void _Table__OnRefreshEvent(object sender, Table e)
+        {
+            _HeaderBase._ResetCellContentSize();
+        }
+
         /// <summary>
         /// 选择框发生变化监听事件
         /// </summary>
@@ -235,6 +247,7 @@ namespace XP.TableModel
         protected override void OnDestroy()
         {
             base.OnDestroy();
+            _IsInsideBoundary = false;
             if (cellData != null)
             {
                 cellData.PropertyChanged -= _CellData_PropertyChanged;
@@ -249,6 +262,10 @@ namespace XP.TableModel
                 {
                     _HeaderBase._HeaderCells.Remove(this);
                 } 
+            }
+            if (_Table)
+            {
+                _Table._OnRefreshEvent -= _Table__OnRefreshEvent;
             }
        
         }

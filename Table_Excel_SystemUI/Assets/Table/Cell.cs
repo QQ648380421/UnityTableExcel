@@ -429,7 +429,7 @@ namespace XP.TableModel
         /// <param name="e"></param>
         private void _Table__OnRefreshEvent(object sender, Table e)
         {
-            _UpdateData();
+            _Initialization();
         }
 
         /// <summary>
@@ -440,19 +440,30 @@ namespace XP.TableModel
             if (_Table)
             { 
                 _CellData = _Table._CellDatas[_index];
+                if (_CellData==null)
+                {
+                    Destroy(this.gameObject);
+                    return;
+                }
                 _CellData._ColumnCell = _ColumnCell;
                 _CellData._RowCell = _RowCell;
            
             }
         
         }
+        /// <summary>
+        /// ≥ı ºªØ
+        /// </summary>
+        public virtual  void _Initialization() {
+            StartCoroutine(_YieldUpdatePos());
+            if (_Table) _Table__MultiSelectChangedEvent(_Table, _Table._MultiSelect);
+            _UpdateData();
+        }
         protected override void Start()
         {
             base.Start();
             _RegisterEvents();
-            StartCoroutine(_YieldUpdatePos());
-            if (_Table) _Table__MultiSelectChangedEvent(_Table, _Table._MultiSelect); 
-            _UpdateData(); 
+            _Initialization();
         }
 
         private void Update()
@@ -461,9 +472,17 @@ namespace XP.TableModel
             {
                 _ColumnAndRowCell__IsInsideBoundaryChangedEvent(_ColumnCell, _ColumnCell._IsInsideBoundary);
             }
+            else
+            {
+                Destroy(this.gameObject);
+            }
             if (_RowCell)
             {
                 _ColumnAndRowCell__IsInsideBoundaryChangedEvent(_RowCell, _RowCell._IsInsideBoundary);
+            }
+            else
+            {
+                Destroy(this.gameObject);
             }
     
         }

@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.UI;
 namespace XP.TableModel
@@ -49,6 +50,26 @@ namespace XP.TableModel
                 this._CreateCellData(indexV2);
             }
 
+        }
+
+        public override void _Remove(int index)
+        {
+            base._Remove(index);
+            var _cellDatas = _Table._CellDatas.Where(p => p != null && p._Row == index);
+            if (_cellDatas == null || _cellDatas.Count()<=0) return;
+            var _removeArr= _cellDatas.ToArray(); 
+            foreach (var item in _removeArr)
+            {
+                _Table._CellDatas.Remove(item);
+            }
+            foreach (var item in _Table._CellDatas)
+            {
+                if (item._Row >= index)
+                {
+                    item._Row--;
+                }
+            }
+            _Table._Refresh();
         }
     }
 }

@@ -10,7 +10,6 @@ using System;
 
 namespace XP.TableModel
 {
-    //备忘录：添加一列或者添加一行，要同步向cellData里添加同样多的数据缓冲区
     /// <summary>
     /// 表格
     /// </summary>
@@ -81,6 +80,45 @@ namespace XP.TableModel
         /// </summary>
         public bool _LockHeaderColumnCells { get => lockHeaderColumnCells; set => lockHeaderColumnCells = value; }
 
+        /// <summary>
+        /// 删除选中行
+        /// </summary>
+        public void RemoveSelectedRow()
+        {
+            List<int> _removeIndexBuffer = new List<int>();
+            foreach (var item in _CurrentSelectedCellDatas)
+            {
+                if (!_removeIndexBuffer.Contains(item._Row))
+                {
+                    _removeIndexBuffer.Add(item._Row);
+                }
+            }
+            _removeIndexBuffer = _removeIndexBuffer.OrderByDescending(p=>p).ToList();
+            foreach (var item in _removeIndexBuffer)
+            {
+                _RemoveRow(item);
+            } 
+        }
+
+        /// <summary>
+        /// 删除选中列
+        /// </summary>
+        public void RemoveSelectedColumn()
+        {
+            List<int> _removeIndexBuffer = new List<int>();
+            foreach (var item in _CurrentSelectedCellDatas)
+            {
+                if (!_removeIndexBuffer.Contains(item._Column))
+                {
+                    _removeIndexBuffer.Add(item._Column);
+                }
+            }
+            _removeIndexBuffer = _removeIndexBuffer.OrderByDescending(p => p).ToList();
+            foreach (var item in _removeIndexBuffer)
+            {
+                _RemoveColum(item);
+            }
+        }
         [SerializeField]
         private bool lockHeaderRowCells = true;
         /// <summary>
@@ -163,17 +201,17 @@ namespace XP.TableModel
             _CellDatas.CollectionChanged -= _CellDatas_CollectionChanged;
             _CellDatas.CollectionChanged += _CellDatas_CollectionChanged; 
         }
-
-        
-
-        private void Start()
+         
+        private IEnumerator Start()
         {
             for (int i = 0; i < 10; i++)
             {
+                yield return null;
                 _AddColumn();
             }
-            for (int i = 0; i < 20; i++)
+            for (int i = 0; i < 40; i++)
             {
+                yield return null;
                 _AddRow();
             }
             int index=0; 
@@ -253,7 +291,7 @@ namespace XP.TableModel
         /// <param name="row"></param>
         public void _RemoveRow(int row)
         {
-            throw new Exception();
+            _HeaderRow._Remove(row);
         }
 
         /// <summary>
@@ -262,16 +300,20 @@ namespace XP.TableModel
         /// <param name="row"></param>
         public void _RemoveColum(int colum)
         {
-            throw new Exception();
-
+            _HeaderColumn._Remove(colum); 
         }
-
+        /// <summary>
+        /// 重置滑动条
+        /// </summary>
+        public void _ResetScroll() {
+            _ScrollRect.verticalScrollbar.value = 1;
+            _ScrollRect.horizontalScrollbar.value = 0;
+        }
         /// <summary>
         /// 刷新表
         /// </summary>
         public virtual void _Refresh() {
-            _ScrollRect.verticalScrollbar.value = 0;
-            _ScrollRect.horizontalScrollbar.value = 0;
+           
             _OnRefreshEvent?.Invoke(this,this);
         }
 

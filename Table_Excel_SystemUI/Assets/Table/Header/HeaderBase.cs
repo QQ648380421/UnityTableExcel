@@ -122,8 +122,7 @@ namespace XP.TableModel
         }
         protected virtual  void Reset()
         { 
-            Unit._AddComponent<ContentSizeFitter>(this.gameObject);
-            Unit._AddComponent<LayoutElement>(this.gameObject);
+            Unit._AddComponent<ContentSizeFitter>(this.gameObject); 
             Unit._AddComponent<ToggleGroup>(this.gameObject).allowSwitchOff=true;
         }
         public abstract void _ScrollRectValueChanged(Vector2 vector2);
@@ -195,6 +194,24 @@ namespace XP.TableModel
         public virtual HeaderCellBase _FindCellOfIndex(int index) { 
         return    _HeaderCells.FirstOrDefault(p=>p._CellData._Index==index);
         }
-
+        /// <summary>
+        /// É¾³ý±íÍ·
+        /// </summary>
+        /// <param name="row"></param>
+        public virtual void _Remove(int index)
+        {
+            var _cell= _FindCellOfIndex(index);
+            if (!_cell) return;
+            _HeaderCells.Remove(_cell);
+           
+            Destroy(_cell.gameObject);
+            foreach (var item in _HeaderCells)
+            {
+                if (item._CellData._Index>=index)
+                {
+                    item._CellData._Index--;
+                }
+            }
+        }
     }
 }

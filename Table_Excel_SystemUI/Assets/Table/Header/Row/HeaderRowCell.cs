@@ -53,7 +53,7 @@ namespace XP.TableModel
                 {
                     foreach (var item in _cellDatas)
                     {
-                        if (item._ColumnCell.isOn == true && value == false)
+                        if (item._ColumnCell==null ||  item._ColumnCell.isOn == true && value == false)
                         {//如果有一边选中了，不能取消
                             continue;
                         }
