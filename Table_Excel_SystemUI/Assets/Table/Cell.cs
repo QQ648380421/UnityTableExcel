@@ -75,6 +75,14 @@ namespace XP.TableModel
             {//数据发生变化
                 _CellData_DataPropertyChanged();
             }
+            else
+            if (e.PropertyName == nameof(CellData._Cell))
+            {//数据发生变化
+                if (cellData._Cell==null)
+                {
+                    cellData._Cell = this;
+                }
+            }
         }
         
         CellView cellView;
@@ -97,13 +105,61 @@ namespace XP.TableModel
                 cellView = value;
             }
         }
+ 
         public override void OnPointerClick(PointerEventData eventData)
         {
-            base.OnPointerClick(eventData);
-            if (Input.GetKey(KeyCode.LeftControl) || Input.GetKey(KeyCode.RightCurlyBracket)) return;
+            base.OnPointerClick(eventData); 
+            if (Input.GetKey(KeyCode.LeftShift) || Input.GetKey(KeyCode.RightShift) && cellData!=null)
+            {//如果按了shift，可以跨行多选
+                Vector2Int _minIndex = Vector2Int.zero;
+                Vector2Int _maxIndex = Vector2Int.zero;
+                var _selectBuffer= _Table._CurrentSelectedCellDatas.Where(p=>p!=null &&p._Cell!=this);
+                if (_selectBuffer == null || _selectBuffer.Count() <= 0) return;
+                var _firstColumnIndex= _selectBuffer.Min(p=> p._Column); 
+                 var _firstRowIndex = _selectBuffer.Min(p => p._Row);
+                if (this.cellData._Column> _firstColumnIndex)
+                {
+                    _maxIndex.x = this.cellData._Column;
+                    _minIndex.x = _firstColumnIndex;
+                }
+                else
+                {
+                    _maxIndex.x = _firstColumnIndex;
+                    _minIndex.x = this.cellData._Column;
+                }
+                if (this.cellData._Row > _firstRowIndex)
+                {
+                    _maxIndex.y = this.cellData._Row;
+                    _minIndex.y = _firstRowIndex;
+                }
+                else
+                {
+                    _maxIndex.y = _firstRowIndex;
+                    _minIndex.y = this.cellData._Row;
+                } 
+                var _selectCells=  _Table._CellDatas.Where(p => 
+                p != null 
+                && p._Column >= _minIndex.x && p._Column<= _maxIndex.x
+                && p._Row >= _minIndex.y && p._Row <= _maxIndex.y
+                );
+
+                var _selectedBuffer= _Table._CurrentSelectedCellDatas.ToArray();
+
+                foreach (var item in _selectedBuffer)
+                {
+                    if (item._Cell == this) continue;
+                    item._Selected = false;
+                }
+                foreach (var item in _selectCells)
+                {
+                    item._Selected = true;
+                }
+                return;
+            }
+            if (Input.GetKey(KeyCode.LeftControl) || Input.GetKey(KeyCode.RightCurlyBracket)) return;//按了ctl键可以多选，直接返回
             foreach (var item in _Table._CellDatas)
             {
-                if (item._Cell!=this)
+                if ( item._Cell!=this)
                 {
                     item._Selected = false;
                 }
@@ -158,9 +214,9 @@ namespace XP.TableModel
             {
                 if (columnCell)
                 {
-                    return columnCell._HeaderBase;
+                    column = columnCell._HeaderBase; 
                 }
-                return null;
+                return column;
             } 
         }
 
@@ -175,9 +231,9 @@ namespace XP.TableModel
             {
                 if (rowCell)
                 {
-                    return rowCell._HeaderBase;
+                    row = rowCell._HeaderBase; 
                 }
-                return null;
+                return row;
             } 
         }
 
@@ -273,7 +329,7 @@ namespace XP.TableModel
         private IEnumerator _YieldUpdatePos()
         {
             yield return null;
-            _UpdatePos();
+            _UpdatePos(); 
         }
 
 
@@ -333,9 +389,10 @@ namespace XP.TableModel
         /// <summary>
         /// 选中状态发生变化
         /// </summary>
-        private void _IsOnValueChanged(bool value) { 
+        private void _IsOnValueChanged(bool value) {
+ 
             if (cellData == null) return;
-            cellData._Selected = value;
+            cellData._Selected = value; 
             if (value)
             {//选中表头单元格
                 if (_ColumnCell)
@@ -345,10 +402,8 @@ namespace XP.TableModel
                 if (_RowCell)
                 {
                     _RowCell.SetIsOnWithoutNotify(value);
-                }
-              
-            }
-         
+                } 
+            } 
         }
         /// <summary>
         /// 允许多选发生变化
@@ -447,7 +502,10 @@ namespace XP.TableModel
                 }
                 _CellData._ColumnCell = _ColumnCell;
                 _CellData._RowCell = _RowCell;
-           
+                if (_CellData._Cell!=this)
+                { 
+                    _CellData._Cell = this;
+                }
             }
         
         }
@@ -455,6 +513,7 @@ namespace XP.TableModel
         /// 初始化
         /// </summary>
         public virtual  void _Initialization() {
+            cellData = null;
             StartCoroutine(_YieldUpdatePos());
             if (_Table) _Table__MultiSelectChangedEvent(_Table, _Table._MultiSelect);
             _UpdateData();
@@ -483,8 +542,7 @@ namespace XP.TableModel
             else
             {
                 Destroy(this.gameObject);
-            }
-    
+            } 
         }
         protected override void OnDestroy()
         {
@@ -498,6 +556,7 @@ namespace XP.TableModel
             if (cellData != null)
             {
                 cellData.PropertyChanged -= Value_PropertyChanged;
+                cellData._Cell = null;
             }
             
         }

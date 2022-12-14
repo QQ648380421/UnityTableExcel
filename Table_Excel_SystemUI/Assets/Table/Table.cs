@@ -11,7 +11,7 @@ using System;
 namespace XP.TableModel
 {
     /// <summary>
-    /// 表格
+    /// 表格//加反射
     /// </summary>
     public class Table : MonoBehaviour
     {
@@ -22,8 +22,10 @@ namespace XP.TableModel
         /// <summary>
         /// 最大行索引
         /// </summary>
-        int _MaxRowIndex {
-            get {
+        int _MaxRowIndex
+        {
+            get
+            {
                 return _HeaderRow._HeaderCellsCount;
             }
         }
@@ -42,18 +44,24 @@ namespace XP.TableModel
         /// <summary>
         /// 滚动容器组件
         /// </summary>
-        public ScrollRect _ScrollRect { get {
+        public ScrollRect _ScrollRect
+        {
+            get
+            {
                 if (!scrollRect)
                 {
                     scrollRect = GetComponent<ScrollRect>();
                 }
                 return scrollRect;
-            }   }
+            }
+        }
         /// <summary>
         /// 单元格滚动容器
         /// </summary>
-        public RectTransform _CellContent {
-            get {
+        public RectTransform _CellContent
+        {
+            get
+            {
                 return _ScrollRect.content;
             }
         }
@@ -68,8 +76,10 @@ namespace XP.TableModel
         /// <summary>
         /// 所有实例单元格
         /// </summary>
-        public  List<Cell> _Cells {
-            get {
+        public List<Cell> _Cells
+        {
+            get
+            {
                 return _CellView._Cells;
             }
         }
@@ -93,11 +103,11 @@ namespace XP.TableModel
                     _removeIndexBuffer.Add(item._Row);
                 }
             }
-            _removeIndexBuffer = _removeIndexBuffer.OrderByDescending(p=>p).ToList();
+            _removeIndexBuffer = _removeIndexBuffer.OrderByDescending(p => p).ToList();
             foreach (var item in _removeIndexBuffer)
             {
                 _RemoveRow(item);
-            } 
+            }
         }
 
         /// <summary>
@@ -125,7 +135,7 @@ namespace XP.TableModel
         /// 锁定表头行
         /// </summary>
         public bool _LockHeaderRowCells { get => lockHeaderRowCells; set => lockHeaderRowCells = value; }
-         /// <summary>
+        /// <summary>
         /// 表头控制器
         /// </summary>
         public HeaderColumn _HeaderColumn;
@@ -155,9 +165,11 @@ namespace XP.TableModel
                 _MultiSelectChangedEvent?.Invoke(this, value);
             }
         }
-        Cell this[int column,int row] {
-            get {
-                return _Cells.FirstOrDefault(p=>p!=null &&p._CellData._Column==column && p._CellData._Row==row);
+        Cell this[int column, int row]
+        {
+            get
+            {
+                return _Cells.FirstOrDefault(p => p != null && p._CellData._Column == column && p._CellData._Row == row);
             }
         }
         Cell this[CellData cellData]
@@ -170,7 +182,7 @@ namespace XP.TableModel
         /// <summary>
         /// 当前选中单元格数据，可以监听该字段里的<see cref="ObservableCollection.CollectionChanged"/>事件
         /// </summary>
-        public readonly ObservableCollection<CellData> _CurrentSelectedCellDatas=new ObservableCollection<CellData>();
+        public readonly ObservableCollection<CellData> _CurrentSelectedCellDatas = new ObservableCollection<CellData>();
 
         /// <summary>
         /// 刷新表格事件
@@ -181,8 +193,9 @@ namespace XP.TableModel
         /// </summary>
         /// <param name="row"></param>
         /// <returns></returns>
-        public IEnumerable<Cell> _GetRowCells(int row) {
-          return  _Cells.Where(p=>p._CellData._Row== row);
+        public IEnumerable<Cell> _GetRowCells(int row)
+        {
+            return _Cells.Where(p => p._CellData._Row == row);
         }
         /// <summary>
         /// 获取列所有单元格
@@ -197,61 +210,49 @@ namespace XP.TableModel
 
 
         private void Awake()
-        { 
-            _CellDatas.CollectionChanged -= _CellDatas_CollectionChanged;
-            _CellDatas.CollectionChanged += _CellDatas_CollectionChanged; 
-        }
-         
-        private IEnumerator Start()
         {
-            for (int i = 0; i < 10; i++)
-            {
-                yield return null;
-                _AddColumn();
-            }
-            for (int i = 0; i < 40; i++)
-            {
-                yield return null;
-                _AddRow();
-            }
-            int index=0; 
-            foreach (var item in _CellDatas)
-            {
-                item._Data = index; 
-                index++;
-            }
+            _CellDatas.CollectionChanged -= _CellDatas_CollectionChanged;
+            _CellDatas.CollectionChanged += _CellDatas_CollectionChanged;
         }
+
+
         /// <summary>
         /// 当单元格列表发生变化时触发
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
         private void _CellDatas_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
-        { 
+        {
             switch (e.Action)
             {
-                case NotifyCollectionChangedAction.Add: 
+                case NotifyCollectionChangedAction.Add:
                     break;
                 case NotifyCollectionChangedAction.Move:
                     break;
-                case NotifyCollectionChangedAction.Remove: 
+                case NotifyCollectionChangedAction.Remove:
+                    var _removeCell = e.OldItems[0] as CellData;
+                    if (_removeCell != null && _CurrentSelectedCellDatas.Contains(_removeCell))
+                    {
+                        _CurrentSelectedCellDatas.Remove(_removeCell);
+                    }
                     break;
-                case NotifyCollectionChangedAction.Replace: 
+                case NotifyCollectionChangedAction.Replace:
                     break;
-                case NotifyCollectionChangedAction.Reset: 
+                case NotifyCollectionChangedAction.Reset:
                     break;
                 default:
                     break;
             }
 
         }
-         
+
         /// <summary>
         /// 添加一列
         /// </summary>
         /// <param name="columnCellData"></param>
-        public HeaderCellBase _AddColumn(HeaderCellData   headerCellData) {
-          return  _HeaderColumn._Add(headerCellData);  
+        public HeaderCellBase _AddColumn(HeaderCellData headerCellData)
+        {
+            return _HeaderColumn._Add(headerCellData);
         }
         /// <summary>
         /// 添加一行
@@ -259,7 +260,7 @@ namespace XP.TableModel
         /// <param name="columnCellData"></param>
         public HeaderCellBase _AddRow(HeaderCellData headerCellData)
         {
-         return   _HeaderRow._Add(headerCellData);
+            return _HeaderRow._Add(headerCellData);
         }
 
         /// <summary>
@@ -270,8 +271,8 @@ namespace XP.TableModel
         {
             HeaderCellData headerCellData = new HeaderCellData();
             headerCellData._Index = _MaxColumnIndex;
-            headerCellData._Data = "Column" + headerCellData._Index; 
-           return    _AddColumn(headerCellData);
+            headerCellData._Data = "Column" + headerCellData._Index;
+            return _AddColumn(headerCellData);
         }
         /// <summary>
         /// 添加一行
@@ -300,21 +301,23 @@ namespace XP.TableModel
         /// <param name="row"></param>
         public void _RemoveColum(int colum)
         {
-            _HeaderColumn._Remove(colum); 
+            _HeaderColumn._Remove(colum);
         }
         /// <summary>
         /// 重置滑动条
         /// </summary>
-        public void _ResetScroll() {
+        public void _ResetScroll()
+        {
             _ScrollRect.verticalScrollbar.value = 1;
             _ScrollRect.horizontalScrollbar.value = 0;
         }
         /// <summary>
         /// 刷新表
         /// </summary>
-        public virtual void _Refresh() {
-           
-            _OnRefreshEvent?.Invoke(this,this);
+        public virtual void _Refresh()
+        {
+
+            _OnRefreshEvent?.Invoke(this, this);
         }
 
 

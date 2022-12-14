@@ -52,11 +52,13 @@ namespace XP.TableModel
                  
                 if (value._Data==null)
                 {
+                   
                     _OnCellNameChanged?.Invoke(string.Empty);
                 }
                 else
                 {
-                    _OnCellNameChanged?.Invoke(value._Data.ToString());
+                    name = value._Index.ToString();
+                   _OnCellNameChanged?.Invoke(value._Data.ToString());
                 }
 
             }

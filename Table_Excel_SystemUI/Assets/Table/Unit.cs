@@ -1,6 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
-using UnityEngine;
+using UnityEngine; 
 namespace XP.TableModel
 {
     /// <summary>
@@ -15,7 +15,7 @@ namespace XP.TableModel
         /// <param name="gameObject"></param>
         /// <returns></returns>
         public static T _AddComponent<T>(GameObject gameObject) where T:Component
-        {
+        { 
             if (gameObject==null)
             {
                 return default(T);
@@ -27,5 +27,6 @@ namespace XP.TableModel
             } 
             return _com;
         }
+
     }
 }

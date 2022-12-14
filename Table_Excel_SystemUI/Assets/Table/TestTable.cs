@@ -14,9 +14,9 @@ namespace XP.TableModel
         public Table _Table;
         public TMP_InputField _ValueInput;
         public Button _AddRow, _AddColumn, _RemoveRow, _RemoveColumn,_ChangeSelectText;
-
+        public int _IniColumn=10, _IniRow=30;
         // Start is called before the first frame update
-        void Start()
+        IEnumerator Start()
         {
             _AddRow.onClick.AddListener(() =>
             {
@@ -30,6 +30,23 @@ namespace XP.TableModel
             _RemoveColumn.onClick.AddListener(_RemoveColumnClick);
 
             _ChangeSelectText.onClick.AddListener(__ChangeSelectText);
+
+            for (int i = 0; i < _IniColumn; i++)
+            {
+                yield return null;
+              _Table.  _AddColumn();
+            }
+            for (int i = 0; i < _IniRow; i++)
+            {
+                yield return null;
+                _Table._AddRow();
+            }
+            int index = 0;
+            foreach (var item in _Table._CellDatas)
+            {
+                item._Data = index;
+                index++;
+            }
         }
         private void __ChangeSelectText() {
             foreach (var item in _Table._CurrentSelectedCellDatas)

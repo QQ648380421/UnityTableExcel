@@ -52,7 +52,7 @@ namespace XP.TableModel
                 get => cell; set
                 {
                     if (cell == value) return;
-                    cell = value;
+                    cell = value; 
                     _InvokePropertyChanged(nameof(_Cell));
                 }
             }
@@ -91,9 +91,12 @@ namespace XP.TableModel
                 }
             }
 
-            public override bool _Selected { get => base._Selected; set { 
+            public override bool _Selected
+            {
+                get => base._Selected; set
+                {
                     base._Selected = value;
-                    if (!_Table) return;
+                    if (!_Table) return; 
                     if (value)
                     {
                         if (!_Table._CurrentSelectedCellDatas.Contains(this))
@@ -106,10 +109,10 @@ namespace XP.TableModel
                         if (_Table._CurrentSelectedCellDatas.Contains(this))
                         {
                             _Table._CurrentSelectedCellDatas.Remove(this);
-                        } 
-                    }
-    
-                }  }
+                        }
+                    } 
+                }
+            }
             ~CellData() {
                 if (_Table)
                 {

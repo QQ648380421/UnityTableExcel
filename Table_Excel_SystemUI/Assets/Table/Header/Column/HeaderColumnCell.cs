@@ -52,15 +52,10 @@ namespace XP.TableModel
                 var _cellDatas = _Table._CellDatas._GetColumnCellsData(_CellData._Index);
 
                 if (_Table._MultiSelect)
-                {
-
+                { 
                     foreach (var item in _cellDatas)
-                    { 
-                        if (item._RowCell==null || item._RowCell.isOn == true && value == false)
-                        {//如果有一边选中了，不能取消
-                            continue;
-                        }
-                        item._Selected = value;
+                    {  
+                        item._Selected = value; 
                     }
                 }
                 else

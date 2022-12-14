@@ -144,6 +144,7 @@ namespace XP.TableModel
                     _Row = indexV2.y,
                     _Table=this._Table
                 };
+                
                 _Table._CellDatas.Add(_findCellData);
             }
             return _findCellData;
