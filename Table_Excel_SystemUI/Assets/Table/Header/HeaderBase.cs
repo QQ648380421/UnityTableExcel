@@ -10,7 +10,7 @@ namespace XP.TableModel
     /// <summary>
     /// 表头基类
     /// </summary>
-    public abstract class HeaderBase : Selectable
+    public abstract class HeaderBase : MonoBehaviour
     {
         Table _table;
         /// <summary>
@@ -98,18 +98,30 @@ namespace XP.TableModel
             } 
         }
 
-
-        protected override void Start()
+        ToggleGroup toggleGroup;
+        public ToggleGroup _ToggleGroup
         {
-            base.Start();
+            get
+            {
+                if (!toggleGroup)
+                {
+                    toggleGroup = GetComponent<ToggleGroup>();
+                }
+                return toggleGroup;
+            } 
+        }
+
+        protected virtual void Start()
+        {
+          
             _ResetCellContentSize();
             _Table._ScrollRect.onValueChanged.AddListener(_ScrollRectValueChanged); 
         }
-        protected override void Reset()
-        {
-            base.Reset();
+        protected virtual  void Reset()
+        { 
             Unit._AddComponent<ContentSizeFitter>(this.gameObject);
-            Unit._AddComponent<LayoutElement>(this.gameObject);  
+            Unit._AddComponent<LayoutElement>(this.gameObject);
+            Unit._AddComponent<ToggleGroup>(this.gameObject).allowSwitchOff=true;
         }
         public abstract void _ScrollRectValueChanged(Vector2 vector2);
          

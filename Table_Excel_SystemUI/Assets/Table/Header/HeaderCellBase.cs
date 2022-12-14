@@ -16,7 +16,7 @@ namespace XP.TableModel
     /// <summary>
     /// 表头单元格基类
     /// </summary>
-    public abstract  class HeaderCellBase : Button
+    public abstract  class HeaderCellBase : Toggle
     {
         [Header("当列名发生变化时触发")]
         public InputField.OnChangeEvent _OnCellNameChanged;
@@ -43,20 +43,20 @@ namespace XP.TableModel
                     cellData.PropertyChanged -= _CellData_PropertyChanged;
                 }
                 cellData = value;
-                if (cellData != null)
-                {
-                    cellData.PropertyChanged -= _CellData_PropertyChanged;
-                    cellData.PropertyChanged += _CellData_PropertyChanged;
-                    transform.SetSiblingIndex(cellData._Index);
-                }
                 _OnCellDataChangeEvent?.Invoke(this, value);
-                if (value == null)
+                if (value == null) return;
+
+                value.PropertyChanged -= _CellData_PropertyChanged;
+                value.PropertyChanged += _CellData_PropertyChanged;
+                transform.SetSiblingIndex(value._Index);
+                 
+                if (value._Data==null)
                 {
                     _OnCellNameChanged?.Invoke(string.Empty);
                 }
                 else
                 {
-                    _OnCellNameChanged?.Invoke(value._Name);
+                    _OnCellNameChanged?.Invoke(value._Data.ToString());
                 }
 
             }
@@ -104,6 +104,20 @@ namespace XP.TableModel
             } 
         }
 
+
+        ToggleGroup  toggleGroup;
+        public ToggleGroup _ToggleGroup
+        {
+            get
+            {
+                if (!toggleGroup&&  _HeaderBase)
+                {
+                    toggleGroup = _HeaderBase._ToggleGroup;
+                }
+                return  toggleGroup;
+            } 
+        }
+
         /// <summary>
         /// 是否在显示范围边界内状态改变时触发
         /// </summary>
@@ -141,16 +155,28 @@ namespace XP.TableModel
         {
             if (_CellData == null) return;
 
-            if (e.PropertyName == nameof(HeaderCellData._Name))
+            if (e.PropertyName == nameof(HeaderCellData._Data))
             {
-                _OnCellNameChanged?.Invoke(_CellData._Name);
+                if (_CellData._Data==null)
+                {
+                    _OnCellNameChanged?.Invoke(string.Empty);
+                }
+                else
+                {
+                    _OnCellNameChanged?.Invoke(_CellData._Data.ToString());
+                }
+               
             }
             else if (e.PropertyName == nameof(HeaderCellData._Index))
             {
                 transform.SetSiblingIndex(_CellData._Index);
             }
         }
-
+        protected override void Awake()
+        {
+            base.Awake();
+            this.group = _ToggleGroup;
+        }
         protected override void Start()
         {
             base.Start();

@@ -7,7 +7,7 @@ namespace XP.TableModel
 {
     [CustomEditor(typeof(HeaderCellBase),true)]
     [CanEditMultipleObjects]
-    public class HeaderCellBaseEditor : ButtonEditor
+    public class HeaderCellBaseEditor : ToggleEditor
     {
         SerializedProperty _DragButtonProperty;
         SerializedProperty _OnCellNameChangedProperty;

@@ -16,7 +16,7 @@ namespace XP.TableModel
     /// <summary>
     /// 单元格
     /// </summary>
-    public partial class Cell : Selectable
+    public partial class Cell : Toggle
     {
         /// <summary>
         /// 用来方便调试查看的数据
@@ -41,6 +41,7 @@ namespace XP.TableModel
                 _CellDataChangedEvents_String?.Invoke(dataStr);
                 if (value == null) return;
                 value._Cell = this;
+                isOn = value._Selected;
             }  }
           
         CellView cellView;
@@ -51,6 +52,10 @@ namespace XP.TableModel
         {
             get
             {
+                if (!cellView)
+                {
+                    GetComponentInParent<CellView>();
+                }
                 return cellView;
             }
             set
@@ -60,6 +65,22 @@ namespace XP.TableModel
             }
         }
 
+
+        Table table;
+        public Table _Table
+        {
+            get
+            {
+                if (!table)
+                {
+                    if (_CellView)
+                    {
+                        table = _CellView._Table;
+                    } 
+                }
+                return table;
+            } 
+        }
 
         RectTransform rectTransform;
 
@@ -216,17 +237,26 @@ namespace XP.TableModel
         /// <summary>
         /// 注册事件
         /// </summary>
-        private void _RegisterEvents() {
-            _CellView._Table._HeaderColumn._OnRectSizeChangedEvent += _Header__OnRectSizeChangedEvent;
-            _CellView._Table._HeaderRow._OnRectSizeChangedEvent += _Header__OnRectSizeChangedEvent;
+        private void _RegisterEvents() { 
+            if (_Table)
+            {
+                _Table._HeaderColumn._OnRectSizeChangedEvent += _Header__OnRectSizeChangedEvent;
+                _Table._HeaderRow._OnRectSizeChangedEvent += _Header__OnRectSizeChangedEvent;
+                _Table._OnRefreshEvent += _Table__OnRefreshEvent;
+            }
+           
         }
         /// <summary>
         /// 清除事件
         /// </summary>
         private void _ClearEvents()
-        { 
-            _CellView._Table._HeaderColumn._OnRectSizeChangedEvent -= _Header__OnRectSizeChangedEvent;
-            _CellView._Table._HeaderRow._OnRectSizeChangedEvent -= _Header__OnRectSizeChangedEvent;
+        {  
+            if (_Table)
+            {
+                _Table._HeaderRow._OnRectSizeChangedEvent -= _Header__OnRectSizeChangedEvent;
+                _Table._HeaderColumn._OnRectSizeChangedEvent -= _Header__OnRectSizeChangedEvent;
+                _Table._OnRefreshEvent += _Table__OnRefreshEvent;
+            }
         }
         /// <summary>
         /// 清理边界事件
@@ -262,24 +292,42 @@ namespace XP.TableModel
         protected override void Awake()
         {
             base.Awake();
-            
         }
         /// <summary>
-        /// 初始化数据
+        /// 当调用表格刷新时触发
         /// </summary>
-        private void IniData() { 
-             var _index= _Index(); 
-            _CellData =  _CellView._Table._CellDatas[_index]; 
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void _Table__OnRefreshEvent(object sender, Table e)
+        {
+            _UpdateData();
+        }
+
+        /// <summary>
+        /// 刷新该单元格数据
+        /// </summary>
+        private void _UpdateData() { 
+             var _index= _Index();
+            if (_Table)
+            {
+                _CellData = _Table._CellDatas[_index];
+            }
+        
         }
         protected override void Start()
         {
             base.Start();
             _RegisterEvents();
             StartCoroutine(_YieldUpdatePos());
-            IniData();
+            _UpdateData();
+            if (_CellView)
+            {
+                this.group = _CellView._ToggleGroup; 
+            }
+
         }
-      
-     
+
+
         protected override void OnDestroy()
         {
             base.OnDestroy();

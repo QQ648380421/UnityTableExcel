@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using UnityEngine;
+using UnityEngine.UI;
+
 namespace XP.TableModel
 {
     /// <summary>
@@ -24,6 +26,20 @@ namespace XP.TableModel
                 }
                 return _table;
             }
+        }
+
+
+        ToggleGroup toggleGroup;
+        public ToggleGroup _ToggleGroup
+        {
+            get
+            {
+                if (!toggleGroup)
+                {
+                    toggleGroup = GetComponent<ToggleGroup>();
+                }
+                return toggleGroup;
+            } 
         }
         /// <summary>
         /// 所有的单元格
@@ -70,7 +86,10 @@ namespace XP.TableModel
         {
             _RegisterEvents();
         }
-       
+        private void Reset()
+        {
+            toggleGroup=  Unit._AddComponent<ToggleGroup>(this.gameObject);
+        }
         private void OnDestroy()
         {
             _ClearEvents();
@@ -79,7 +98,7 @@ namespace XP.TableModel
         /// <summary>
         /// 实例化一个新预制体
         /// </summary>
-        private Cell CreatePrefab(HeaderCellBase headerColumnCell, HeaderCellBase headerRowCell) {
+        private Cell CreatePrefab(HeaderCellBase headerColumnCell, HeaderCellBase headerRowCell) { 
             var _newCell = Instantiate(_CellPrefab, transform);
             _newCell._CellView = this;
             _newCell._RowCell = headerRowCell;

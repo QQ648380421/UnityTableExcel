@@ -5,6 +5,7 @@ using System.Collections.Specialized;
 using System.Linq;
 using UnityEngine.UI;
 using static XP.TableModel.Cell;
+using System;
 
 namespace XP.TableModel
 {
@@ -67,7 +68,11 @@ namespace XP.TableModel
         /// <summary>
         /// 所有实例单元格
         /// </summary>
-        public readonly List<Cell> _Cells = new List<Cell>();
+        public  List<Cell> _Cells {
+            get {
+                return _CellView._Cells;
+            }
+        }
         [SerializeField]
         private bool lockHeaderColumnCells = true;
         /// <summary>
@@ -102,6 +107,11 @@ namespace XP.TableModel
                 return _Cells.FirstOrDefault(p => p != null && p._CellData._Column == cellData._Column && p._CellData._Row == cellData._Row);
             }
         }
+
+        /// <summary>
+        /// 刷新表格事件
+        /// </summary>
+        public event EventHandler<Table> _OnRefreshEvent;
         /// <summary>
         /// 获取行所有单元格
         /// </summary>
@@ -133,7 +143,7 @@ namespace XP.TableModel
             for (int i = 0; i < 10; i++)
             {
                 _AddColumn(new HeaderCellData() { 
-                 _Name="Column"+i,
+                 _Data="Column"+i,
                   _Index=i,
                    Width=300,
                     Higth=50
@@ -142,7 +152,7 @@ namespace XP.TableModel
             for (int i = 0; i < 20; i++)
             {
                 _AddRow(new HeaderCellData() { 
-                 _Name="Row"+i,
+                 _Data="Row"+i,
                   _Index=i,
                    Width=300,
                    Higth=50
@@ -208,12 +218,14 @@ namespace XP.TableModel
         {
             _CellDatas._RemoveColumn(colum);
         }
+    
         /// <summary>
         /// 刷新表
         /// </summary>
         public virtual void _Refresh() {
             _ScrollRect.verticalScrollbar.value = 0;
             _ScrollRect.horizontalScrollbar.value = 0;
+            _OnRefreshEvent?.Invoke(this,this);
         }
 
 

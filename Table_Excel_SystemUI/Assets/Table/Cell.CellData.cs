@@ -10,60 +10,14 @@ namespace XP.TableModel
         /// 单元格数据
         /// </summary>
         [Serializable]
-        public class CellData : INotifyPropertyChanged
-        {
-         
-            /// <summary>
-            /// 单元格中的<see cref="_Data"/>和<see cref="_Row"/>还有<see cref="_Column"/>等数据发生变化时触发
-            /// </summary>
-            public event _CellDataChanged _CellDataChangeEvent;
-            public event PropertyChangedEventHandler PropertyChanged;
-
+        public class CellData : CellDataBase
+        { 
+       
             private Cell cell;
-            object data;
-            /// <summary>
-            /// 触发事件<see cref="PropertyChanged"/>
-            /// </summary>
-            /// <param name="name"></param>
-            private void _InvokePropertyChanged(string name)
-            {
-                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
-            }
-            /// <summary>
-            /// 单元格数据，你传入的数据，可以转化成你想要的
-            /// </summary>
-            public object _Data
-            {
-                get => data; set
-                {
-                    if (data == value) return;
-                    data = value;
-                    _CellDataChangeEvent?.Invoke(this._Cell, this);
-                    string valueStr = string.Empty;
-
-                    if (value != null)
-                    {
-                        valueStr = value.ToString();
-                    }
-                    if (cell)
-                    {
-                        cell._Invoke__CellDataChangeEvent(cell, this);
-                        cell._CellDataChangedEvents_String?.Invoke(valueStr);
-                    }
-                    _InvokePropertyChanged(nameof(_Data));
-                }
-            }
-
+              
             [SerializeField]
             int row, column;
-
-            public CellData(object data, int row, int colum)
-            {
-                this.row = row;
-                this.column = colum;
-                this.data = data;
-            }
-
+             
             /// <summary>
             /// 行
             /// </summary>
@@ -73,8 +27,7 @@ namespace XP.TableModel
                 set
                 {
                     if (row == value) return;
-                    row = value;
-                    _CellDataChangeEvent?.Invoke(this._Cell, this);
+                    row = value; 
                     _InvokePropertyChanged(nameof(_Row));
                 }
             }
@@ -87,10 +40,8 @@ namespace XP.TableModel
                 set
                 {
                     if (column == value) return;
-                    column = value;
-                    _CellDataChangeEvent?.Invoke(this._Cell, this);
-                    _InvokePropertyChanged(nameof(_Column));
-
+                    column = value; 
+                    _InvokePropertyChanged(nameof(_Column)); 
                 }
             }
             /// <summary>
