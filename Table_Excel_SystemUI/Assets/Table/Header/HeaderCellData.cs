@@ -47,7 +47,7 @@ namespace XP.TableModel
             }
         }
 
-        private float higth=30;
+        private float higth=50;
           
 
     }

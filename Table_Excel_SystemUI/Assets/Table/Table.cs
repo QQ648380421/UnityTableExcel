@@ -7,6 +7,8 @@ using System.Linq;
 using UnityEngine.UI;
 using static XP.TableModel.Cell;
 using System;
+using XP.TableModel.Test;
+using System.Reflection;
 
 namespace XP.TableModel
 {
@@ -95,7 +97,88 @@ namespace XP.TableModel
                 return _CellView._Cells;
             }
         }
- 
+        /// <summary>
+        /// 绑定列
+        /// </summary>
+        private void _BindColumns(List<ColumnAttributeData>  columnAttributeDatas) {
+            var _columnMax= columnAttributeDatas.Max(p=>p._ColumnAttribute._Index);
+            for (int i = 0; i < _columnMax; i++)
+            {
+             var _column=   _AddColumn();
+                var columnData= columnAttributeDatas.FirstOrDefault(p=>p._ColumnAttribute._Index==i); 
+                _column._ColumnAttributeData = columnData; 
+            } 
+        }
+        /// <summary>
+        /// 绑定行数据
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="cellData"></param>
+        /// <param name="rowAttributeDatas"></param>
+        /// <param name="item"></param>
+        private void _BindRowData<T>(CellData cellData, List<ColumnAttributeData> rowAttributeDatas,T item)
+        {
+            //找到当前列特性数据
+            var _attributeData = rowAttributeDatas.FirstOrDefault(p => p._ColumnAttribute._Index == cellData._Column); 
+            if (_attributeData == null) return; 
+             var _data=  _attributeData._PropertyInfo.GetValue(item);
+            cellData._Data = _data; 
+        }
+        /// <summary>
+        /// 绑定行数据
+        /// </summary>
+        private void _BindRows<T>(List<ColumnAttributeData> rowAttributeDatas, ICollection<T> arrayData)
+        {
+            int rowIndex = 0;
+                foreach (var item in arrayData)
+                {
+                    var _row = _AddRow();
+                    var _cellDatas = _row.GetCells(); 
+                    foreach (var cellDataItem in _cellDatas)
+                    {
+                        _BindRowData(cellDataItem, rowAttributeDatas, item);
+                      
+                     } 
+                rowIndex++;
+            } 
+        }
+        ///// <summary>
+        ///// 绑定数据
+        ///// </summary>
+        //private void _BindData<T>(T data)
+        //{
+        //    if (data == null) return;
+        //    var _type= data.GetType();
+        //    var _properties = _type.GetProperties();
+        //    //先找出忽略的列
+        //    List<PropertyInfo> addPropertys = new List<PropertyInfo>();
+        //    foreach (var item in _properties)
+        //    {
+        //        if (!Attribute.IsDefined(item, typeof(ColumnAttribute))) continue;
+        //        Attribute.IsDefined(item,typeof(ColumnAttribute));
+        //        item.GetCustomAttributes();
+
+        //    }
+        //    for (int i = 0; i < length; i++)
+        //    {
+
+        //    } 
+        //}
+        /// <summary>
+        /// 绑定数组数据
+        /// </summary>
+        /// <param name="arrayData"></param>
+        public void _BindArray<T>(ICollection<T> arrayData)
+        { 
+            _ClearTable();
+            if (arrayData == null) return;
+            List<ColumnAttributeData> _ColumnAttributeDatas =  ColumnAttribute.GetColumnAttributeDatas<T>();
+            if (_ColumnAttributeDatas == null || _ColumnAttributeDatas.Count <= 0) return;
+            _BindColumns(_ColumnAttributeDatas);
+            _BindRows(_ColumnAttributeDatas, arrayData);
+           
+        }
+
 
         /// <summary>
         /// 删除选中行
@@ -322,24 +405,24 @@ namespace XP.TableModel
         /// 添加一列
         /// </summary>
         /// <param name="columnCellData"></param>
-        public HeaderCellBase _AddColumn(HeaderCellData headerCellData)
+        public HeaderColumnCell _AddColumn(HeaderCellData headerCellData)
         {
-            return _HeaderColumn._Add(headerCellData);
+            return (HeaderColumnCell)_HeaderColumn._Add(headerCellData);
         }
         /// <summary>
         /// 添加一行
         /// </summary>
         /// <param name="columnCellData"></param>
-        public HeaderCellBase _AddRow(HeaderCellData headerCellData)
+        public HeaderRowCell _AddRow(HeaderCellData headerCellData)
         {
-            return _HeaderRow._Add(headerCellData);
+            return (HeaderRowCell)_HeaderRow._Add(headerCellData);
         }
 
         /// <summary>
         /// 添加一列
         /// </summary>
         /// <param name="columnCellData"></param>
-        public HeaderCellBase _AddColumn()
+        public HeaderColumnCell _AddColumn()
         {
             HeaderCellData headerCellData = new HeaderCellData();
             headerCellData._Index = _MaxColumnIndex;
@@ -350,7 +433,7 @@ namespace XP.TableModel
         /// 添加一行
         /// </summary>
         /// <param name="columnCellData"></param>
-        public HeaderCellBase _AddRow()
+        public HeaderRowCell _AddRow()
         {
             HeaderCellData headerCellData = new HeaderCellData();
             headerCellData._Index = _MaxRowIndex;

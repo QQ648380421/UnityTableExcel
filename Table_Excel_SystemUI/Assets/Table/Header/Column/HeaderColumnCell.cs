@@ -4,6 +4,7 @@ using System.Linq;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
+using static XP.TableModel.Cell;
 using static XP.TableModel.HeaderColumnCell;
 
 namespace XP.TableModel
@@ -14,6 +15,36 @@ namespace XP.TableModel
     /// </summary>
     public class HeaderColumnCell : HeaderCellBase
     {
+        private ColumnAttributeData columnAttributeData;
+        /// <summary>
+        /// 关联列特性数据
+        /// </summary>
+        public virtual ColumnAttributeData _ColumnAttributeData
+        {
+            get => columnAttributeData; set
+            {
+                if (columnAttributeData == value) return;
+                columnAttributeData = value;
+                if (value == null)
+                {
+                    _CellData._Data = string.Empty;
+                    return;
+                }
+                _CellData._Data = value._ColumnAttribute._Name;
+                _SetRectSize_X(value._ColumnAttribute._Width);
+            }
+        }
+        public override HeaderCellData _CellData { get => base._CellData; set {
+                base._CellData = value;
+                if (value == null) return;
+                _SetRectSize_X(value.Width);
+            } }
+
+        public override IEnumerable<CellData> GetCells()
+        {
+            return _Table._CellDatas._GetColumCellDatas(_CellData._Index);
+        }
+    
         public override bool InsideBoundary()
         {
             if (_HeaderBase==null) return false;

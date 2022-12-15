@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using TMPro;
@@ -6,28 +7,6 @@ using UnityEngine.UI;
 
 namespace XP.TableModel.Test
 {
-    public class TestData {
-
-        int Id;
-        [Column(0, "–Ú∫≈")]
-        public int _Id
-        {
-            get
-            {
-                return Id;
-            }
-            set
-            {
-                if (Id == value) return;
-                Id = value;
-            }
-        }
-
-        private void _CellClickDelegate(CellClickData cellClickData) { 
-        
-        }
-
-    }
     /// <summary>
     /// ≤‚ ‘Ω≈±æ
     /// </summary>
@@ -35,11 +14,33 @@ namespace XP.TableModel.Test
     {
         public Table _Table;
         public TMP_InputField _ValueInput;
-        public Button _AddRow, _AddColumn, _RemoveRow, _RemoveColumn,_ChangeSelectText;
+        public Button _AddRow, _AddColumn, _RemoveRow, _RemoveColumn,_ChangeSelectText,_ClearButton,_TestBindArray;
         public int _IniColumn=10, _IniRow=30;
         // Start is called before the first frame update
+        /// <summary>
+        /// ≤‚ ‘∞Û∂® ˝æ›
+        /// </summary>
+        private void _TestBindArr() {
+            _Table._ClearTable();
+            List<TestData> _TestDatas = new List<TestData>();
+            for (int i = 0; i < 100; i++)
+            {
+                var _testData= new TestData();
+                _testData._Id = i;
+                _testData.Name = "Bind:"+i;
+                _testData._Money = UnityEngine.Random.Range(0,999f);
+                _testData._Select = i%2==0;
+                _testData._Time = DateTime.Now.AddDays(i);
+                _testData._Age = UnityEngine.Random.Range(10,80);
+                _TestDatas.Add(_testData);
+            }
+
+            _Table._BindArray(_TestDatas);
+
+        }
         IEnumerator Start()
-        {  
+        {
+ 
             _AddRow.onClick.AddListener(() =>
             {
                 StartCoroutine(_AddRowClick());
@@ -48,11 +49,14 @@ namespace XP.TableModel.Test
             {
                 StartCoroutine(_AddColumnClick());
             });
+            _ClearButton.onClick.AddListener(()=> {
+                _Table._ClearTable();
+            });
             _RemoveRow.onClick.AddListener(_RemoveRowClick);
             _RemoveColumn.onClick.AddListener(_RemoveColumnClick);
 
             _ChangeSelectText.onClick.AddListener(__ChangeSelectText);
-
+            _TestBindArray.onClick.AddListener(_TestBindArr);
             for (int i = 0; i < _IniColumn; i++)
             {
                 yield return null;
@@ -70,7 +74,7 @@ namespace XP.TableModel.Test
                 index++;
             }
 
-            _Table._ClearTable();
+            
 
 
         }

@@ -1,9 +1,11 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
+using static XP.TableModel.Cell;
 using static XP.TableModel.HeaderColumnCell;
 
 namespace XP.TableModel
@@ -14,6 +16,16 @@ namespace XP.TableModel
     /// </summary>
     public class HeaderRowCell : HeaderCellBase
     {
+        public override HeaderCellData _CellData { get => base._CellData; set {
+                base._CellData = value;
+                if (value == null) return;
+                _SetRectSize_Y(value.Higth);
+            } }
+
+        public override IEnumerable<CellData> GetCells()
+        { 
+          return  _Table._CellDatas._GetRowCellDatas(_CellData._Index) ;
+        }
 
         public override bool InsideBoundary()
         {
@@ -66,5 +78,7 @@ namespace XP.TableModel
                 }
             }
         }
+
+       
     }
 }

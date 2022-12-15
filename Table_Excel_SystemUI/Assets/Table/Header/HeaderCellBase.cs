@@ -4,6 +4,8 @@ using UnityEngine;
 using UnityEngine.UI;
 using static XP.TableModel.HeaderColumnCell;
 using UnityEngine.EventSystems;
+using static XP.TableModel.Cell;
+
 namespace XP.TableModel
 {
     public delegate void _CellDataChangeDelegate(HeaderCellBase cell, HeaderCellData columnCellData);
@@ -16,7 +18,7 @@ namespace XP.TableModel
     /// <summary>
     /// 表头单元格基类
     /// </summary>
-    public abstract  class HeaderCellBase : Toggle
+    public abstract class HeaderCellBase : Toggle
     {
         /// <summary>
         /// 当单元格被点击时触发
@@ -37,7 +39,7 @@ namespace XP.TableModel
         /// <summary>
         /// 单元格数据
         /// </summary>
-        public HeaderCellData _CellData
+        public virtual HeaderCellData _CellData
         {
             get => cellData; set
             {
@@ -53,30 +55,34 @@ namespace XP.TableModel
                 value.PropertyChanged -= _CellData_PropertyChanged;
                 value.PropertyChanged += _CellData_PropertyChanged;
                 transform.SetSiblingIndex(value._Index);
-                 
-                if (value._Data==null)
+
+                if (value._Data == null)
                 {
-                   
+
                     _OnCellNameChanged?.Invoke(string.Empty);
                 }
                 else
                 {
                     name = value._Index.ToString();
-                   _OnCellNameChanged?.Invoke(value._Data.ToString());
+                    _OnCellNameChanged?.Invoke(value._Data.ToString());
                 }
-
+                
             }
         }
         /// <summary>
         /// 父级表头基类
         /// </summary>
-        public HeaderBase _HeaderBase { get {
+        public HeaderBase _HeaderBase
+        {
+            get
+            {
                 if (!headerBase)
                 {
                     headerBase = GetComponentInParent<HeaderBase>();
                 }
                 return headerBase;
-            } }
+            }
+        }
 
         HeaderBase headerBase;
 
@@ -92,7 +98,7 @@ namespace XP.TableModel
                 }
                 return table;
             }
-          
+
         }
 
         RectTransform rectTransform;
@@ -105,7 +111,7 @@ namespace XP.TableModel
                     rectTransform = transform as RectTransform;
                 }
                 return rectTransform;
-            } 
+            }
         }
 
 
@@ -122,21 +128,21 @@ namespace XP.TableModel
                     parentMask = GetComponentInParent<Mask>();
                 }
                 return parentMask;
-            } 
+            }
         }
+    
 
-
-        ToggleGroup  toggleGroup;
+        ToggleGroup toggleGroup;
         public ToggleGroup _ToggleGroup
         {
             get
             {
-                if (!toggleGroup&&  _HeaderBase)
+                if (!toggleGroup && _HeaderBase)
                 {
                     toggleGroup = _HeaderBase._ToggleGroup;
                 }
-                return  toggleGroup;
-            } 
+                return toggleGroup;
+            }
         }
 
         /// <summary>
@@ -145,6 +151,8 @@ namespace XP.TableModel
         public event _IsInsideBoundaryChangeDelegate _IsInsideBoundaryChangedEvent;
 
         bool isInsideBoundary;
+
+
         /// <summary>
         /// 该单元格是否在边界内，每一帧刷新一次
         /// </summary>
@@ -158,15 +166,16 @@ namespace XP.TableModel
             {
                 if (isInsideBoundary == value) return;
                 isInsideBoundary = value;
-                _IsInsideBoundaryChangedEvent?.Invoke(this,value);
+                _IsInsideBoundaryChangedEvent?.Invoke(this, value);
             }
         }
+   
 
         /// <summary>
         /// 该单元格是否处于边界内
         /// </summary>
         public abstract bool InsideBoundary();
-         
+
         /// <summary>
         /// 数据发生变化时触发
         /// </summary>
@@ -178,7 +187,7 @@ namespace XP.TableModel
 
             if (e.PropertyName == nameof(HeaderCellData._Data))
             {
-                if (_CellData._Data==null)
+                if (_CellData._Data == null)
                 {
                     _OnCellNameChanged?.Invoke(string.Empty);
                 }
@@ -186,7 +195,7 @@ namespace XP.TableModel
                 {
                     _OnCellNameChanged?.Invoke(_CellData._Data.ToString());
                 }
-               
+
             }
             else if (e.PropertyName == nameof(HeaderCellData._Index))
             {
@@ -208,7 +217,10 @@ namespace XP.TableModel
             _Table._OnRefreshEvent += _Table__OnRefreshEvent;
 
         }
-        
+        /// <summary>
+        /// 获取关联单元格列表
+        /// </summary>
+        public abstract IEnumerable<CellData> GetCells();
         /// <summary>
         /// 刷新
         /// </summary>
@@ -223,7 +235,8 @@ namespace XP.TableModel
         /// 选择框发生变化监听事件
         /// </summary>
         /// <param name="value"></param>
-        protected virtual void _IsOnChangedListener(bool value) {
+        protected virtual void _IsOnChangedListener(bool value)
+        {
             if (_HeaderBase)
             {
                 if (value)
@@ -241,7 +254,7 @@ namespace XP.TableModel
                     }
                 }
             }
-         
+
             _IsOnChanged(value);
         }
         /// <summary>
@@ -267,13 +280,46 @@ namespace XP.TableModel
                 if (_HeaderBase._HeaderCells.Contains(this))
                 {
                     _HeaderBase._HeaderCells.Remove(this);
-                } 
+                }
             }
             if (_Table)
             {
                 _Table._OnRefreshEvent -= _Table__OnRefreshEvent;
             }
-       
+
+        }
+
+        /// <summary>
+        /// 设置宽高大小
+        /// </summary>
+        public virtual void _SetRectSize_X(float x)
+        {
+            Vector2 vector2= _RectTransform.sizeDelta;
+            vector2.x = x;
+            _SetRectSize(vector2);
+        }
+        /// <summary>
+        /// 设置宽高大小
+        /// </summary>
+        public virtual void _SetRectSize_Y(float y)
+        {
+            Vector2 vector2 = _RectTransform.sizeDelta;
+            vector2.y = y;
+            _SetRectSize(vector2);
+        }
+        /// <summary>
+        /// 设置宽高大小
+        /// </summary>
+        public virtual void _SetRectSize(Vector2 rectSize) {
+            _RectTransform.sizeDelta = rectSize;
+            UpdateRectSize();
+        }
+
+        /// <summary>
+        /// 刷新宽高大小
+        /// </summary>
+        public virtual void UpdateRectSize() {
+            _HeaderBase._ResetCellContentSize();
         }
 
         /// <summary>
@@ -281,15 +327,17 @@ namespace XP.TableModel
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        protected void _DragButton__OnEndDragEvent(object sender, UnityEngine.EventSystems.PointerEventData e) {
-            _HeaderBase._ResetCellContentSize();
+        protected void _DragButton__OnEndDragEvent(object sender, UnityEngine.EventSystems.PointerEventData e)
+        {
+            UpdateRectSize();
         }
         public override void OnPointerClick(PointerEventData eventData)
         {
             base.OnPointerClick(eventData);
-            _OnHeaderCellClickEvent?.Invoke(new CellClickData() { 
-             _Selectable=this,
-              _EventData=eventData
+            _OnHeaderCellClickEvent?.Invoke(new CellClickData()
+            {
+                _Selectable = this,
+                _EventData = eventData
             });
         }
         private void Update()

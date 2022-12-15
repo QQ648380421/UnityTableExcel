@@ -160,10 +160,8 @@ namespace XP.TableModel
             var _newObj= Instantiate(_HeaderCellPrefab, _CreatePrefabView); 
             _newObj._CellData = cellData; 
             _HeaderCells.Add(_newObj);
-            _OnAddHeaderCellCreateCellData(cellData);
-         
-
-            _ResetCellContentSize();
+            _OnAddHeaderCellCreateCellData(cellData); 
+            _ResetCellContentSize(); 
             return _newObj;
         }
 
