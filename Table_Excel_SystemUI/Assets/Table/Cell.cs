@@ -10,6 +10,7 @@ using UnityEngine.EventSystems;
 
 namespace XP.TableModel
 {
+  
     [Serializable]
     public class CellDataEvent : UnityEvent<object> { }
     public delegate void _CellDataChanged(Cell _cell, CellData _cellData);
@@ -19,6 +20,10 @@ namespace XP.TableModel
     /// </summary>
     public partial class Cell : Toggle
     {
+        /// <summary>
+        /// 单元格被点击事件
+        /// </summary>
+        public event _CellClickDelegate _OnCellClickEvent;
         /// <summary>
         /// 用来方便调试查看的数据
         /// </summary>
@@ -108,7 +113,13 @@ namespace XP.TableModel
  
         public override void OnPointerClick(PointerEventData eventData)
         {
-            base.OnPointerClick(eventData); 
+            base.OnPointerClick(eventData);
+            var _cellClickData= new CellClickData() { 
+             _Selectable=this,
+              _EventData= eventData
+            }; 
+            _OnCellClickEvent?.Invoke(_cellClickData);
+           
             if (Input.GetKey(KeyCode.LeftShift) || Input.GetKey(KeyCode.RightShift) && cellData!=null)
             {//如果按了shift，可以跨行多选
                 Vector2Int _minIndex = Vector2Int.zero;
@@ -375,7 +386,9 @@ namespace XP.TableModel
         /// <summary>
         /// 注册事件
         /// </summary>
-        private void _RegisterEvents() { 
+        private void _RegisterEvents() {
+            _OnCellClickEvent -= Cell__OnCellClickEvent;
+            _OnCellClickEvent += Cell__OnCellClickEvent;
             if (_Table)
             {
                 _Table._HeaderColumn._OnRectSizeChangedEvent += _Header__OnRectSizeChangedEvent;
@@ -431,7 +444,7 @@ namespace XP.TableModel
         /// </summary>
         private void _ClearEvents()
         {
-        
+            this._OnCellClickEvent -= Cell__OnCellClickEvent;
             if (_Table)
             {
                 _Table._HeaderRow._OnRectSizeChangedEvent -= _Header__OnRectSizeChangedEvent;
@@ -475,8 +488,22 @@ namespace XP.TableModel
 
         protected override void Awake()
         {
-            base.Awake();
+            base.Awake(); 
         }
+
+        /// <summary>
+        /// 转发单元格被点击事件，避免触发几次
+        /// </summary>
+        /// <param name="cellClickData"></param>
+        private void Cell__OnCellClickEvent(CellClickData cellClickData)
+        {
+            if (cellData != null)
+            {
+                cellData._Invoke_OnCellDataClickEvent(cellClickData);
+            }
+
+        }
+
         /// <summary>
         /// 当调用表格刷新时触发
         /// </summary>
@@ -544,6 +571,7 @@ namespace XP.TableModel
                 Destroy(this.gameObject);
             } 
         }
+        
         protected override void OnDestroy()
         {
             base.OnDestroy();

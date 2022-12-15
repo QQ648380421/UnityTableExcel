@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using static XP.TableModel.HeaderColumnCell;
-
+using UnityEngine.EventSystems;
 namespace XP.TableModel
 {
     public delegate void _CellDataChangeDelegate(HeaderCellBase cell, HeaderCellData columnCellData);
@@ -18,6 +18,10 @@ namespace XP.TableModel
     /// </summary>
     public abstract  class HeaderCellBase : Toggle
     {
+        /// <summary>
+        /// 当单元格被点击时触发
+        /// </summary>
+        public event _CellClickDelegate _OnHeaderCellClickEvent;
         [Header("当列名发生变化时触发")]
         public InputField.OnChangeEvent _OnCellNameChanged;
         /// <summary>
@@ -280,7 +284,14 @@ namespace XP.TableModel
         protected void _DragButton__OnEndDragEvent(object sender, UnityEngine.EventSystems.PointerEventData e) {
             _HeaderBase._ResetCellContentSize();
         }
-
+        public override void OnPointerClick(PointerEventData eventData)
+        {
+            base.OnPointerClick(eventData);
+            _OnHeaderCellClickEvent?.Invoke(new CellClickData() { 
+             _Selectable=this,
+              _EventData=eventData
+            });
+        }
         private void Update()
         {
             _IsInsideBoundary = InsideBoundary();

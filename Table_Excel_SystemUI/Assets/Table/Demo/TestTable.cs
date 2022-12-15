@@ -4,8 +4,30 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace XP.TableModel
+namespace XP.TableModel.Test
 {
+    public class TestData {
+
+        int Id;
+        [Column(0, "–Ú∫≈")]
+        public int _Id
+        {
+            get
+            {
+                return Id;
+            }
+            set
+            {
+                if (Id == value) return;
+                Id = value;
+            }
+        }
+
+        private void _CellClickDelegate(CellClickData cellClickData) { 
+        
+        }
+
+    }
     /// <summary>
     /// ≤‚ ‘Ω≈±æ
     /// </summary>
@@ -17,7 +39,7 @@ namespace XP.TableModel
         public int _IniColumn=10, _IniRow=30;
         // Start is called before the first frame update
         IEnumerator Start()
-        {
+        {  
             _AddRow.onClick.AddListener(() =>
             {
                 StartCoroutine(_AddRowClick());
@@ -47,6 +69,10 @@ namespace XP.TableModel
                 item._Data = index;
                 index++;
             }
+
+            _Table._ClearTable();
+
+
         }
         private void __ChangeSelectText() {
             foreach (var item in _Table._CurrentSelectedCellDatas)

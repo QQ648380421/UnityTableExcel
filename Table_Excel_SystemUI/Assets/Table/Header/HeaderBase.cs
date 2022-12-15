@@ -12,6 +12,7 @@ namespace XP.TableModel
     /// </summary>
     public abstract class HeaderBase : MonoBehaviour
     {
+     
         Table _table;
         /// <summary>
         /// ±í¸ñ¿ØÖÆÆ÷
@@ -203,7 +204,7 @@ namespace XP.TableModel
         {
             var _cell= _FindCellOfIndex(index);
             if (!_cell) return;
-            _HeaderCells.Remove(_cell);
+         
            
             Destroy(_cell.gameObject);
             foreach (var item in _HeaderCells)
@@ -213,6 +214,7 @@ namespace XP.TableModel
                     item._CellData._Index--;
                 }
             }
+            _HeaderCells.Remove(_cell);
         }
     }
 }

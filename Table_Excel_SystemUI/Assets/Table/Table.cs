@@ -10,11 +10,23 @@ using System;
 
 namespace XP.TableModel
 {
+
     /// <summary>
     /// 表格//加反射
     /// </summary>
     public class Table : MonoBehaviour
     {
+        /// <summary>
+        /// 当表格被点击时触发
+        /// </summary>
+        public event _CellClickDelegate _OnCellClickEvent;
+  
+        public CellData this[int x,int y]
+        {
+            get {
+                return _GetCellData(x,y);
+            } 
+        }
         /// <summary>
         /// 单元格数据
         /// </summary>
@@ -76,19 +88,14 @@ namespace XP.TableModel
         /// <summary>
         /// 所有实例单元格
         /// </summary>
-        public List<Cell> _Cells
+        public ObservableCollection<Cell> _Cells
         {
             get
             {
                 return _CellView._Cells;
             }
         }
-        [SerializeField]
-        private bool lockHeaderColumnCells = true;
-        /// <summary>
-        /// 锁定表头列
-        /// </summary>
-        public bool _LockHeaderColumnCells { get => lockHeaderColumnCells; set => lockHeaderColumnCells = value; }
+ 
 
         /// <summary>
         /// 删除选中行
@@ -129,12 +136,7 @@ namespace XP.TableModel
                 _RemoveColum(item);
             }
         }
-        [SerializeField]
-        private bool lockHeaderRowCells = true;
-        /// <summary>
-        /// 锁定表头行
-        /// </summary>
-        public bool _LockHeaderRowCells { get => lockHeaderRowCells; set => lockHeaderRowCells = value; }
+ 
         /// <summary>
         /// 表头控制器
         /// </summary>
@@ -164,21 +166,7 @@ namespace XP.TableModel
                 multiSelect = value;
                 _MultiSelectChangedEvent?.Invoke(this, value);
             }
-        }
-        Cell this[int column, int row]
-        {
-            get
-            {
-                return _Cells.FirstOrDefault(p => p != null && p._CellData._Column == column && p._CellData._Row == row);
-            }
-        }
-        Cell this[CellData cellData]
-        {
-            get
-            {
-                return _Cells.FirstOrDefault(p => p != null && p._CellData._Column == cellData._Column && p._CellData._Row == cellData._Row);
-            }
-        }
+        } 
         /// <summary>
         /// 当前选中单元格数据，可以监听该字段里的<see cref="ObservableCollection.CollectionChanged"/>事件
         /// </summary>
@@ -207,12 +195,96 @@ namespace XP.TableModel
             return _Cells.Where(p => p._CellData._Column == colum);
         }
 
+        /// <summary>
+        /// 获取行所有单元格数据
+        /// </summary>
+        /// <param name="row"></param>
+        /// <returns></returns>
+        public IEnumerable<CellData> _GetRowCellDatas(int row)
+        {
+            return _CellDatas._GetRowCellDatas(row);
+        }
+        /// <summary>
+        /// 获取单元格数据
+        /// </summary>
+        /// <param name="cellIndex"></param>
+        /// <returns></returns>
+        public CellData _GetCellData(Vector2Int cellIndex) {
+         return   _CellDatas[cellIndex];
+        }
+
+        /// <summary>
+        /// 获取单元格数据
+        /// </summary>
+        /// <param name="cellIndex"></param>
+        /// <returns></returns>
+        public CellData _GetCellData(int x  ,int y)
+        {
+            return _CellDatas[x,y];
+        }
 
 
+        /// <summary>
+        /// 获取列所有单元格数据
+        /// </summary>
+        /// <param name="row"></param>
+        /// <returns></returns>
+        public IEnumerable<CellData> _GetColumCellDatas(int colum)
+        {
+            return _CellDatas._GetColumCellDatas(colum);
+        }
+         
         private void Awake()
         {
+            _Cells.CollectionChanged -= _Cells_CollectionChanged;
+            _Cells.CollectionChanged += _Cells_CollectionChanged;
             _CellDatas.CollectionChanged -= _CellDatas_CollectionChanged;
             _CellDatas.CollectionChanged += _CellDatas_CollectionChanged;
+        }
+
+        /// <summary>
+        /// 单元格集合修改事件
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void _Cells_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
+        {
+            switch (e.Action)
+            {
+                case NotifyCollectionChangedAction.Add:
+                   var _addCell= e.NewItems[0] as Cell ;
+                    if (_addCell)
+                    {
+                        _addCell._OnCellClickEvent -= _addCell_OnCellClickEvent;
+                        _addCell._OnCellClickEvent += _addCell_OnCellClickEvent;
+                    }
+                    break;
+                case NotifyCollectionChangedAction.Move:
+                    break;
+                case NotifyCollectionChangedAction.Remove:
+                    var _removeCell = e.OldItems[0] as Cell;
+                    if (_removeCell)
+                    {
+                        _removeCell._OnCellClickEvent -= _addCell_OnCellClickEvent; 
+                    }
+                    break;
+                case NotifyCollectionChangedAction.Replace:
+                    break;
+                case NotifyCollectionChangedAction.Reset:
+                    break;
+                default:
+                    break;
+            }
+        }
+
+        /// <summary>
+        /// 单元格被点击事件
+        /// </summary>
+        /// <param name="selectable"></param>
+        /// <param name="eventData"></param>
+        private void _addCell_OnCellClickEvent( CellClickData cellClickData)
+        {
+            this._OnCellClickEvent?.Invoke(cellClickData);
         }
 
 
@@ -319,8 +391,34 @@ namespace XP.TableModel
 
             _OnRefreshEvent?.Invoke(this, this);
         }
-
-
+         
+        /// <summary>
+        /// 清空所有行
+        /// </summary>
+        public virtual void _ClearRows()
+        {
+            while (_HeaderRow._HeaderCellsCount > 0)
+            { 
+                _RemoveRow(_HeaderRow._HeaderCellsCount - 1);
+            }
+        }
+        /// <summary>
+        /// 清空所有列
+        /// </summary>
+        public virtual void _ClearColumns()
+        {
+            while (_HeaderColumn._HeaderCellsCount > 0)
+            { 
+                _RemoveColum(_HeaderColumn._HeaderCellsCount - 1);
+            }
+        }
+        /// <summary>
+        /// 清空整个表格
+        /// </summary>
+        public virtual void _ClearTable() {
+            _ClearRows();
+            _ClearColumns(); 
+        }
         //private void Update()
         //{
         //    if (Input.GetKeyDown(KeyCode.Space))

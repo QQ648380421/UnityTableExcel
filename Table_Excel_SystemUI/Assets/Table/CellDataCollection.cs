@@ -117,7 +117,23 @@ namespace XP.TableModel
                 return this.Max(p => p._Column);
             }
         }
-
-        
+        /// <summary>
+        /// 获取所有行单元格数据
+        /// </summary>
+        /// <param name="row"></param>
+        /// <returns></returns>
+        internal IEnumerable<CellData> _GetRowCellDatas(int row)
+        {
+            return this.Where(p=>p._Row==row);
+        }
+        /// <summary>
+        /// 获取所有列单元格数据
+        /// </summary>
+        /// <param name="colum"></param>
+        /// <returns></returns>
+        internal IEnumerable<CellData> _GetColumCellDatas(int colum)
+        {
+            return this.Where(p => p._Column == colum);
+        }
     }
 }

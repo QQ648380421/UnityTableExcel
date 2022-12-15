@@ -44,7 +44,7 @@ namespace XP.TableModel
         /// <summary>
         /// 所有的单元格
         /// </summary>
-        public readonly List<Cell> _Cells = new List<Cell>();
+        public readonly ObservableCollection<Cell> _Cells = new ObservableCollection<Cell>();
         /// <summary>
         /// 单元格预制体
         /// </summary>
