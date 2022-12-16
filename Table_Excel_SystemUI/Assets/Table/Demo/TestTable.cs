@@ -114,7 +114,6 @@ namespace XP.TableModel.Test
         private void _RemoveRowClick()
         { 
             _Table.RemoveSelectedRow();
-
         }
         private void _RemoveColumnClick()
         {
