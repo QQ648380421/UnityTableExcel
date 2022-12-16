@@ -21,10 +21,10 @@ namespace XP.TableModel.Test
         /// 测试绑定数据
         /// </summary>
         private void _TestBindArr() {
-            _Table._ClearTable();
+            //这是你要添加到表的数组
             List<TestData> _TestDatas = new List<TestData>();
             for (int i = 0; i < 100; i++)
-            {
+            {//循环赋值
                 var _testData= new TestData();
                 _testData._Id = i;
                 _testData.Name = "Bind:"+i;
@@ -34,9 +34,9 @@ namespace XP.TableModel.Test
                 _testData._Age = UnityEngine.Random.Range(10,80);
                 _TestDatas.Add(_testData);
             }
-
+            //绑定到表格
             _Table._BindArray(_TestDatas);
-
+            //没了
         }
         IEnumerator Start()
         {

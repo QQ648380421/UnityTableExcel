@@ -6,7 +6,7 @@ namespace XP.TableModel.Test
     public class TestData{
 
         int Id;
-        [Column(0, "Number")]
+        [Column(0, "Number")]//这个标记加上之后，能自动将该属性分配到该列上
         public int _Id
         {
             get

@@ -554,6 +554,7 @@ namespace XP.TableModel
 
         private void Update()
         {
+            if (!Application.isPlaying) return;
             if (_ColumnCell)
             {
                 _ColumnAndRowCell__IsInsideBoundaryChangedEvent(_ColumnCell, _ColumnCell._IsInsideBoundary);
@@ -568,7 +569,8 @@ namespace XP.TableModel
             }
             else
             {
-                Destroy(this.gameObject);
+           
+                Destroy(gameObject);
             } 
         }
         

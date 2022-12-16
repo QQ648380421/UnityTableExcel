@@ -94,6 +94,10 @@ namespace XP.TableModel
             {
                 if (!table)
                 {
+                    if (_HeaderBase==null)
+                    {
+                        return null;
+                    }
                     table = _HeaderBase._Table;
                 }
                 return table;
@@ -199,17 +203,20 @@ namespace XP.TableModel
             }
             else if (e.PropertyName == nameof(HeaderCellData._Index))
             {
-                transform.SetSiblingIndex(_CellData._Index);
+                //transform.SetSiblingIndex(_CellData._Index);
+                //Debug.Log(transform.parent.name+ " "+name+ " SetSiblingIndex:"+ transform.GetSiblingIndex()+" Index:"+ _CellData._Index,this);
             }
         }
         protected override void Awake()
         {
             base.Awake();
+            if (!Application.isPlaying) return;
             this.group = _ToggleGroup;
         }
         protected override void Start()
         {
             base.Start();
+            if (!Application.isPlaying) return;
             _DragButton.transform.SetSiblingIndex(transform.childCount);
             _DragButton._OnEndDragEvent -= _DragButton__OnEndDragEvent;
             _DragButton._OnEndDragEvent += _DragButton__OnEndDragEvent;
@@ -342,6 +349,7 @@ namespace XP.TableModel
         }
         private void Update()
         {
+            if (!Application.isPlaying) return;
             _IsInsideBoundary = InsideBoundary();
 
         }

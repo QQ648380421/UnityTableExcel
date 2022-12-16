@@ -61,6 +61,7 @@ namespace XP.TableModel
         protected override void Start()
         {
             base.Start();
+            if (!Application.isPlaying) return;
             foreach (var item in HeaderDragButtons)
             {
                 item._OnBeginDragEvent -= Item__OnBeginDragEvent;
