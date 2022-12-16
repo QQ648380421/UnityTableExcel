@@ -21,7 +21,9 @@ namespace XP.TableModel.Test
         /// 测试绑定数据
         /// </summary>
         private void _TestBindArr() {
-            //这是你要添加到表的数组
+            //创建数据类型
+            //添加特性
+            //创建数组
             List<TestData> _TestDatas = new List<TestData>();
             for (int i = 0; i < 100; i++)
             {//循环赋值
@@ -70,7 +72,7 @@ namespace XP.TableModel.Test
             int index = 0;
             foreach (var item in _Table._CellDatas)
             {
-                item._Data = index;
+                item._Data = index; 
                 index++;
             }
 

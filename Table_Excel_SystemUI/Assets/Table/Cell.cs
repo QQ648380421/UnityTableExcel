@@ -40,6 +40,7 @@ namespace XP.TableModel
                 dataStr = cellData._Data.ToString();
             }
             _CellDataChangedEvents_String?.Invoke(dataStr);
+            _CellDataChangeEvent?.Invoke(this,cellData);
         }
         /// <summary>
         /// 单元格数据
@@ -61,7 +62,7 @@ namespace XP.TableModel
                 value.PropertyChanged -= Value_PropertyChanged;
                 value.PropertyChanged += Value_PropertyChanged;
                 name = value._Column+","+value._Row;
-
+           
             }  }
 
         /// <summary>
@@ -380,7 +381,7 @@ namespace XP.TableModel
         /// </summary>
         /// <param name="_cell"></param>
         /// <param name="_cellData"></param>
-        public void _Invoke__CellDataChangeEvent(Cell _cell, CellData _cellData) {
+        public void _Invoke__CellDataChangeEvent(Cell _cell, CellData _cellData) { 
             _CellDataChangeEvent?.Invoke(_cell, _cellData);
         }
         /// <summary>
@@ -521,7 +522,7 @@ namespace XP.TableModel
              var _index= _Index();
             if (_Table)
             { 
-                _CellData = _Table._CellDatas[_index];
+                _CellData = _Table._CellDatas[_index]; 
                 if (_CellData==null)
                 {
                     Destroy(this.gameObject);
