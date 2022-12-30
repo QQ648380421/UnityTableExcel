@@ -23,3 +23,6 @@ _Table._BindArray(_TestDatas);
 //没了
 </code></pre>
 
+<p>测试过数据量50*500=25000的单元格，帧数稳定流畅<p/>
+
+![](https://user-images.githubusercontent.com/40554493/210064241-52f87ccb-b049-4c7a-a73e-2aa53fd9ecae.png)
