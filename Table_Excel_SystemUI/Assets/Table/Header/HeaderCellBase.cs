@@ -18,7 +18,7 @@ namespace XP.TableModel
     /// <summary>
     /// 表头单元格基类
     /// </summary>
-    public abstract class HeaderCellBase : Toggle
+    public abstract class HeaderCellBase : Toggle 
     {
         /// <summary>
         /// 当单元格被点击时触发
@@ -35,6 +35,11 @@ namespace XP.TableModel
         /// </summary>
         public HeaderDragButton _DragButton;
 
+        /// <summary>
+        /// <see cref="_CellData"/>发生变化时触发
+        /// </summary>
+        /// <param name="data"></param>
+        public abstract void OnCellDataChanged(HeaderCellData data);
         HeaderCellData cellData;
         /// <summary>
         /// 单元格数据
@@ -48,17 +53,29 @@ namespace XP.TableModel
                 {
                     cellData.PropertyChanged -= _CellData_PropertyChanged;
                 }
-                cellData = value;
+                cellData = value; 
                 _OnCellDataChangeEvent?.Invoke(this, value);
-                if (value == null) return;
-
-                value.PropertyChanged -= _CellData_PropertyChanged;
-                value.PropertyChanged += _CellData_PropertyChanged;
-                transform.SetSiblingIndex(value._Index);
-
-                if (value._Data == null)
+                if (value!=null)
                 {
-
+                    Debug.Log(value._Index, this);
+                }
+                else
+                {
+                    Debug.Log(this, this);
+                }
+              
+                if (value == null) {
+                    
+                    Destroy(this.gameObject);
+                    return;
+                }
+                value._CellObj = this;
+                value.PropertyChanged -= _CellData_PropertyChanged;
+                value.PropertyChanged += _CellData_PropertyChanged; 
+                SetIsOnWithoutNotify(value._Selected);
+                OnCellDataChanged(value);
+                if (value._Data == null)
+                { 
                     _OnCellNameChanged?.Invoke(string.Empty);
                 }
                 else
@@ -66,7 +83,7 @@ namespace XP.TableModel
                     name = value._Index.ToString();
                     _OnCellNameChanged?.Invoke(value._Data.ToString());
                 }
-                
+
             }
         }
         /// <summary>
@@ -112,6 +129,7 @@ namespace XP.TableModel
             {
                 if (!rectTransform)
                 {
+                    if (!this) return null;
                     rectTransform = transform as RectTransform;
                 }
                 return rectTransform;
@@ -148,38 +166,8 @@ namespace XP.TableModel
                 return toggleGroup;
             }
         }
-
-        /// <summary>
-        /// 是否在显示范围边界内状态改变时触发
-        /// </summary>
-        public event _IsInsideBoundaryChangeDelegate _IsInsideBoundaryChangedEvent;
-
-        bool isInsideBoundary;
-
-
-        /// <summary>
-        /// 该单元格是否在边界内，每一帧刷新一次
-        /// </summary>
-        public bool _IsInsideBoundary
-        {
-            get
-            {
-                return isInsideBoundary;
-            }
-            set
-            {
-                if (isInsideBoundary == value) return;
-                isInsideBoundary = value;
-                _IsInsideBoundaryChangedEvent?.Invoke(this, value);
-            }
-        }
-   
-
-        /// <summary>
-        /// 该单元格是否处于边界内
-        /// </summary>
-        public abstract bool InsideBoundary();
-
+         
+        
         /// <summary>
         /// 数据发生变化时触发
         /// </summary>
@@ -217,13 +205,20 @@ namespace XP.TableModel
         {
             base.Start();
             if (!Application.isPlaying) return;
-            _DragButton.transform.SetSiblingIndex(transform.childCount);
+            _DragButton._OnBeginDragEvent -= _DragButton__OnBeginDragEvent;
+            _DragButton._OnBeginDragEvent += _DragButton__OnBeginDragEvent;
             _DragButton._OnEndDragEvent -= _DragButton__OnEndDragEvent;
             _DragButton._OnEndDragEvent += _DragButton__OnEndDragEvent;
             this.onValueChanged.AddListener(_IsOnChangedListener);
             _Table._OnRefreshEvent += _Table__OnRefreshEvent;
 
         }
+
+        private void _DragButton__OnBeginDragEvent(object sender, PointerEventData e)
+        {
+            this.transform.SetAsLastSibling();
+        }
+
         /// <summary>
         /// 获取关联单元格列表
         /// </summary>
@@ -248,16 +243,16 @@ namespace XP.TableModel
             {
                 if (value)
                 {
-                    if (!_HeaderBase._CurrentSelectHeaderCells.Contains(this))
+                    if (!_HeaderBase._CurrentSelectHeaderCells.Contains(this._CellData))
                     {
-                        _HeaderBase._CurrentSelectHeaderCells.Add(this);
+                        _HeaderBase._CurrentSelectHeaderCells.Add(this._CellData);
                     }
                 }
                 else
                 {
-                    if (_HeaderBase._CurrentSelectHeaderCells.Contains(this))
+                    if (_HeaderBase._CurrentSelectHeaderCells.Contains(this._CellData))
                     {
-                        _HeaderBase._CurrentSelectHeaderCells.Remove(this);
+                        _HeaderBase._CurrentSelectHeaderCells.Remove(this._CellData);
                     }
                 }
             }
@@ -272,8 +267,7 @@ namespace XP.TableModel
 
         protected override void OnDestroy()
         {
-            base.OnDestroy();
-            _IsInsideBoundary = false;
+            base.OnDestroy(); 
             if (cellData != null)
             {
                 cellData.PropertyChanged -= _CellData_PropertyChanged;
@@ -319,15 +313,13 @@ namespace XP.TableModel
         /// </summary>
         public virtual void _SetRectSize(Vector2 rectSize) {
             _RectTransform.sizeDelta = rectSize;
-            UpdateRectSize();
+            _DragButton__OnEndDragEvent(null,null);
         }
-
+        
         /// <summary>
         /// 刷新宽高大小
         /// </summary>
-        public virtual void UpdateRectSize() {
-            _HeaderBase._ResetCellContentSize();
-        }
+        public abstract void UpdateRectSize();
 
         /// <summary>
         /// 拖拽按钮结束
@@ -335,8 +327,9 @@ namespace XP.TableModel
         /// <param name="sender"></param>
         /// <param name="e"></param>
         protected void _DragButton__OnEndDragEvent(object sender, UnityEngine.EventSystems.PointerEventData e)
-        {
+        { 
             UpdateRectSize();
+            _HeaderBase._ResetCellContentSize();
         }
         public override void OnPointerClick(PointerEventData eventData)
         {
@@ -347,12 +340,7 @@ namespace XP.TableModel
                 _EventData = eventData
             });
         }
-        private void Update()
-        {
-            if (!Application.isPlaying) return;
-            _IsInsideBoundary = InsideBoundary();
 
-        }
-
+       
     }
 }

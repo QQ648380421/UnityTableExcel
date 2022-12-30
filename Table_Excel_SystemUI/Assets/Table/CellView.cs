@@ -66,18 +66,12 @@ namespace XP.TableModel
             if (  _Table._HeaderRow)
             {
                 _Table._HeaderRow._HeaderCells.CollectionChanged -= _HeaderCells_CollectionChanged;
-                foreach (var item in _Table._HeaderRow._HeaderCells)
-                {
-                    item._IsInsideBoundaryChangedEvent -= _Cell__IsInsideBoundaryChangedEvent;
-                }
+              
             }
             if (_Table._HeaderColumn)
             {
                 _Table._HeaderColumn._HeaderCells.CollectionChanged -= _HeaderCells_CollectionChanged;
-                foreach (var item in _Table._HeaderColumn._HeaderCells)
-                {
-                    item._IsInsideBoundaryChangedEvent -= _Cell__IsInsideBoundaryChangedEvent;
-                }
+            
             }
 
       
@@ -120,17 +114,13 @@ namespace XP.TableModel
                 switch (e.Action)
                 {
                     case System.Collections.Specialized.NotifyCollectionChangedAction.Add:
-                        //监听显示和隐藏事件
-                     var _addCell=   e.NewItems[0] as HeaderCellBase;
-                        _addCell._IsInsideBoundaryChangedEvent -= _Cell__IsInsideBoundaryChangedEvent;
-                        _addCell._IsInsideBoundaryChangedEvent += _Cell__IsInsideBoundaryChangedEvent;
-
+                       
                         break;
                     case System.Collections.Specialized.NotifyCollectionChangedAction.Move:
                         break;
                     case System.Collections.Specialized.NotifyCollectionChangedAction.Remove:
                         var _removeCell = e.OldItems[0] as HeaderCellBase;
-                        _removeCell._IsInsideBoundaryChangedEvent -= _Cell__IsInsideBoundaryChangedEvent; 
+                  
                         break;
                     case System.Collections.Specialized.NotifyCollectionChangedAction.Replace:
                         break;
@@ -145,31 +135,7 @@ namespace XP.TableModel
            
         }
 
-        /// <summary>
-        /// 单元格的显示和隐藏发生变化
-        /// </summary>
-        /// <param name="cell"></param>
-        /// <param name="isInsideBoundary"></param>
-        private void _Cell__IsInsideBoundaryChangedEvent(HeaderCellBase cell, bool isInsideBoundary)
-        {
-            if (cell is HeaderColumnCell _headerColumnCell)
-            {//如果是列 
-                var _rowCells= _Table._HeaderRow.InsideBoundaryCell();
-                foreach (var rowItem in _rowCells)
-                {
-                    CreatePrefab(_headerColumnCell, rowItem);
-                }
-            }
-            else if(cell is HeaderRowCell _headerRowCell)
-            {//行
-                var _columnCells = _Table._HeaderColumn.InsideBoundaryCell();
-                foreach (var columnItem in _columnCells)
-                {
-                    CreatePrefab(columnItem, _headerRowCell);
-                }
-            } 
-        }
-
+       
 
        
          

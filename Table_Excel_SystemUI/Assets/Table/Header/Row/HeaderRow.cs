@@ -71,5 +71,19 @@ namespace XP.TableModel
             }
             _Table._Refresh();
         }
+
+        protected override void _UpdateCells()
+        {
+            float pos = _RectTransform.anchoredPosition.y;
+            float viewSize = _Parent.rect.height;
+            //计算宽高
+            float size = _GetSize();
+            if (size != _RectTransform.sizeDelta.y)
+            {//大小发生变化
+                _RectTransform.sizeDelta = new Vector2(_RectTransform.sizeDelta.x, size); 
+                _ResetCellContentSize();
+            }
+            _UpdateCells(pos, viewSize);
+        }
     }
 }

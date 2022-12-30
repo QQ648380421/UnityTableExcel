@@ -132,9 +132,9 @@ namespace XP.TableModel
             int rowIndex = 0;
                 foreach (var item in arrayData)
                 {
-                    var _row = _AddRow();
-                    var _cellDatas = _row.GetCells(); 
-                    foreach (var cellDataItem in _cellDatas)
+                    var _row = _AddRow(); 
+                    var _cellDatas = _CellDatas._GetRowCellDatas(_row._Index);
+                foreach (var cellDataItem in _cellDatas)
                     {
                         _BindRowData(cellDataItem, rowAttributeDatas, item);
                       
@@ -405,39 +405,41 @@ namespace XP.TableModel
         /// 添加一列
         /// </summary>
         /// <param name="columnCellData"></param>
-        public HeaderColumnCell _AddColumn(HeaderCellData headerCellData)
+        public HeaderCellData _AddColumn(HeaderCellData headerCellData)
         {
-            return (HeaderColumnCell)_HeaderColumn._Add(headerCellData);
+            return _HeaderColumn._Add(headerCellData);
         }
         /// <summary>
         /// 添加一行
         /// </summary>
         /// <param name="columnCellData"></param>
-        public HeaderRowCell _AddRow(HeaderCellData headerCellData)
+        public HeaderCellData _AddRow(HeaderCellData headerCellData)
         {
-            return (HeaderRowCell)_HeaderRow._Add(headerCellData);
+            return  _HeaderRow._Add(headerCellData);
         }
 
         /// <summary>
         /// 添加一列
         /// </summary>
         /// <param name="columnCellData"></param>
-        public HeaderColumnCell _AddColumn()
+        public HeaderCellData _AddColumn()
         {
             HeaderCellData headerCellData = new HeaderCellData();
             headerCellData._Index = _MaxColumnIndex;
             headerCellData._Data = "Column" + headerCellData._Index;
+            headerCellData._Size = 200;
             return _AddColumn(headerCellData);
         }
         /// <summary>
         /// 添加一行
         /// </summary>
         /// <param name="columnCellData"></param>
-        public HeaderRowCell _AddRow()
+        public HeaderCellData _AddRow()
         {
             HeaderCellData headerCellData = new HeaderCellData();
             headerCellData._Index = _MaxRowIndex;
             headerCellData._Data = "Row" + headerCellData._Index;
+            headerCellData._Size = 50;
             return _AddRow(headerCellData);
         }
 

@@ -51,8 +51,7 @@ namespace XP.TableModel
                 {
                     cellData.PropertyChanged -= Value_PropertyChanged;
                 }
-                cellData = value;
-                _ClearIsInsideBoundaryChangedEvent(); 
+                cellData = value; 
                 _Invoke__CellDataChangeEvent(this, value); 
                 _CellDataChangedEvents?.Invoke(value);
                 _CellData_DataPropertyChanged();
@@ -262,17 +261,11 @@ namespace XP.TableModel
             set
             {
                 if (columnCell == value) return;
-                if (columnCell)
-                { 
-                    columnCell._IsInsideBoundaryChangedEvent -= _ColumnAndRowCell__IsInsideBoundaryChangedEvent;
-                }
+               
                 columnCell = value;
                 _UpdatePos();
                 _ColumnCellChangedEvent?.Invoke(this,value);
-                if (columnCell)
-                {
-                    columnCell._IsInsideBoundaryChangedEvent += _ColumnAndRowCell__IsInsideBoundaryChangedEvent; 
-                } 
+             
             }
         }
 
@@ -289,17 +282,11 @@ namespace XP.TableModel
             set
             {
                 if (rowCell == value) return;
-                if (rowCell)
-                {
-                    rowCell._IsInsideBoundaryChangedEvent -= _ColumnAndRowCell__IsInsideBoundaryChangedEvent;
-                }
+              
                 rowCell = value;
                 _UpdatePos();
                 _RowCellChangedEvent?.Invoke(this, value);
-                if (rowCell)
-                {
-                    rowCell._IsInsideBoundaryChangedEvent += _ColumnAndRowCell__IsInsideBoundaryChangedEvent;
-                }
+           
 
             }
         }
@@ -456,15 +443,7 @@ namespace XP.TableModel
             this.onValueChanged.RemoveListener(_IsOnValueChanged); 
       
         }
-        /// <summary>
-        /// 清理边界事件
-        /// </summary>
-        private void _ClearIsInsideBoundaryChangedEvent() {
-            if (columnCell)
-            {
-                columnCell._IsInsideBoundaryChangedEvent -= _ColumnAndRowCell__IsInsideBoundaryChangedEvent;
-            }
-        }
+  
         private void _Header__OnRectSizeChangedEvent()
         {
             _UpdatePos();
@@ -556,21 +535,12 @@ namespace XP.TableModel
         private void Update()
         {
             if (!Application.isPlaying) return;
-            if (_ColumnCell)
+            if (!_ColumnCell)
             {
-                _ColumnAndRowCell__IsInsideBoundaryChangedEvent(_ColumnCell, _ColumnCell._IsInsideBoundary);
-            }
-            else
+                Destroy(gameObject);
+            } else
+            if (!_RowCell)
             {
-                Destroy(this.gameObject);
-            }
-            if (_RowCell)
-            {
-                _ColumnAndRowCell__IsInsideBoundaryChangedEvent(_RowCell, _RowCell._IsInsideBoundary);
-            }
-            else
-            {
-           
                 Destroy(gameObject);
             } 
         }
@@ -578,8 +548,7 @@ namespace XP.TableModel
         protected override void OnDestroy()
         {
             base.OnDestroy();
-            _ClearEvents();
-            _ClearIsInsideBoundaryChangedEvent();
+            _ClearEvents(); 
             if (_CellView)
             {
                 _CellView._Cells.Remove(this);

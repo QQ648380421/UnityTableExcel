@@ -12,8 +12,6 @@ GameObject:
   - component: {fileID: 6398286061549258430}
   - component: {fileID: 6398286061549258425}
   - component: {fileID: 6398286061549258431}
-  - component: {fileID: 6398286061549258424}
-  - component: {fileID: 6398286061549258428}
   - component: {fileID: 5897337185915343977}
   m_Layer: 5
   m_Name: "\u8868\u5934\u5217"
@@ -94,46 +92,6 @@ MonoBehaviour:
   _HeaderCellPrefab: {fileID: 5520167464009252852, guid: e8dd50db3a8cb37429f08a39d9d780c3,
     type: 3}
   _CreatePrefabView: {fileID: 6398286061549258427}
---- !u!114 &6398286061549258424
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6398286061549258426}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 30649d3a9faa99c48a7b1166b86bf2a0, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  m_Padding:
-    m_Left: 0
-    m_Right: 0
-    m_Top: 0
-    m_Bottom: 0
-  m_ChildAlignment: 3
-  m_Spacing: 0
-  m_ChildForceExpandWidth: 0
-  m_ChildForceExpandHeight: 1
-  m_ChildControlWidth: 0
-  m_ChildControlHeight: 1
-  m_ChildScaleWidth: 0
-  m_ChildScaleHeight: 1
-  m_ReverseArrangement: 0
---- !u!114 &6398286061549258428
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6398286061549258426}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 3245ec927659c4140ac4f8d17403cc18, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  m_HorizontalFit: 2
-  m_VerticalFit: 0
 --- !u!114 &5897337185915343977
 MonoBehaviour:
   m_ObjectHideFlags: 0

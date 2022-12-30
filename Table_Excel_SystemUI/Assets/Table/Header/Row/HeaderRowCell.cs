@@ -18,8 +18,7 @@ namespace XP.TableModel
     {
         public override HeaderCellData _CellData { get => base._CellData; set {
                 base._CellData = value;
-                if (value == null) return;
-                _SetRectSize_Y(value.Higth);
+                if (value == null) return; 
             } }
 
         public override IEnumerable<CellData> GetCells()
@@ -27,29 +26,21 @@ namespace XP.TableModel
           return  _Table._CellDatas._GetRowCellDatas(_CellData._Index) ;
         }
 
-        public override bool InsideBoundary()
+        public override void UpdateRectSize()
         {
-            //父物体x对象位置
-            float parentPos_y = Mathf.Abs(_HeaderBase._RectTransform.anchoredPosition.y);
-            float _addHeith = 0;//累加的高度 
-            float _parentSize = Mathf.Abs(_ParentMask.rectTransform.rect.height);
-            float _Pos_y = Mathf.Abs(_RectTransform.anchoredPosition.y);
+            if (_CellData == null) return;
+            _CellData._Size = _RectTransform.sizeDelta.y;
+        }
 
-            for (int i = 0; i < _HeaderBase._HeaderCellsCount; i++)
-            {
-                var _cell = _HeaderBase._TransformIndexFindCell(i);
-                if (!_cell) continue;
-                _addHeith += _cell._RectTransform.sizeDelta.y;
-                if (_cell.gameObject == this.gameObject)
-                {//一直累加到自己
-                    break;
-                }
-            }
-            if (parentPos_y < _addHeith && (parentPos_y + _parentSize) > _Pos_y)
-            {
-                return true;
-            }
-            return false;
+        public override void OnCellDataChanged(HeaderCellData data)
+        {
+            var _size = _RectTransform.sizeDelta;
+            _size.y = data._Size;
+            _RectTransform.sizeDelta = _size;
+
+            var _pos = _RectTransform.anchoredPosition;
+            _pos.y = -data._Position;
+            _RectTransform.anchoredPosition = _pos; 
         }
 
         protected override void _IsOnChanged(bool value)

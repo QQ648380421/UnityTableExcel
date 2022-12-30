@@ -37,39 +37,28 @@ namespace XP.TableModel
         public override HeaderCellData _CellData { get => base._CellData; set {
                 base._CellData = value;
                 if (value == null) return;
-                _SetRectSize_X(value.Width);
             } }
 
         public override IEnumerable<CellData> GetCells()
         {
             return _Table._CellDatas._GetColumCellDatas(_CellData._Index);
         }
-    
-        public override bool InsideBoundary()
+
+        public override void UpdateRectSize()
+        { 
+            if (_CellData == null) return;
+            _CellData._Size = _RectTransform.sizeDelta.x;
+        }
+
+        public override void OnCellDataChanged(HeaderCellData data)
         {
-            if (_HeaderBase==null) return false;
-            //父物体x对象位置
-            float parentPos_x = Mathf.Abs(_HeaderBase._RectTransform.anchoredPosition.x);
-            float _addWidth = 0;//累加的宽度 
-            float _parentSize = Mathf.Abs(_ParentMask.rectTransform.rect.width);
-            float _Pos_x = _RectTransform.anchoredPosition.x;
+         var _size=   _RectTransform.sizeDelta ;
+            _size.x=  data._Size;
+            _RectTransform.sizeDelta = _size;
 
-            for (int i = 0; i < _HeaderBase._HeaderCellsCount; i++)
-            {
-                var _cell = _HeaderBase._TransformIndexFindCell(i);
-                if (!_cell) continue;
-                _addWidth += _cell._RectTransform.sizeDelta.x;
-                if (_cell.gameObject == this.gameObject)
-                {//一直累加到自己
-                    break;
-                }
-            }
-
-            if (_addWidth > parentPos_x && (parentPos_x + _parentSize) > _Pos_x)
-            {
-                return true;
-            }
-            return false;
+            var _pos = _RectTransform.anchoredPosition;
+            _pos.x = data._Position;
+            _RectTransform.anchoredPosition = _pos; 
         }
 
         protected override void _IsOnChanged(bool value)

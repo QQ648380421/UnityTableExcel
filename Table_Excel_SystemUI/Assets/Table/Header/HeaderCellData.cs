@@ -5,6 +5,7 @@ namespace XP.TableModel
     /// <summary>
     /// 表头单元格数据
     /// </summary>
+    [System.Serializable]
     public class HeaderCellData : CellDataBase
     {
         private int index;
@@ -20,35 +21,83 @@ namespace XP.TableModel
                 _InvokePropertyChanged(nameof(_Index));
             }
         }
+
+
+        float size;
         /// <summary>
-        /// 宽度
+        /// 单元格大小宽高
         /// </summary>
-        public float Width
+        public float _Size
         {
-            get => width; set
+            get
             {
-                if (width == value) return;
-                width = value;
-                _InvokePropertyChanged(nameof(Width));
+                return size;
+            }
+            set
+            {
+                if (size == value) return;
+                if (value<5)
+                {
+                    value = 5;
+                }
+                size = value;
+                _InvokePropertyChanged(nameof(_Size));
             }
         }
 
-        private float width=200;
+
+        float position;
         /// <summary>
-        /// 高度
+        /// 单元格当前位置
         /// </summary>
-        public float Higth
+        public float _Position
         {
-            get => higth; set
+            get
             {
-                if (higth == value) return;
-                higth = value;
-                _InvokePropertyChanged(nameof(Higth));
+                return position;
+            }
+            set
+            {
+                if (position == value) return;
+                position = value;
+                _InvokePropertyChanged(nameof(_Position));
             }
         }
 
-        private float higth=50;
-          
 
+        ColumnAttributeData columnAttributeData;
+        /// <summary>
+        /// 关联的特性
+        /// </summary>
+        public ColumnAttributeData _ColumnAttributeData
+        {
+            get
+            {
+                return columnAttributeData;
+            }
+            set
+            {
+                if (columnAttributeData == value) return;
+                columnAttributeData = value;
+            }
+        }
+
+
+        HeaderCellBase CellObj;
+        /// <summary>
+        /// 关联单元格物体
+        /// </summary>
+        public HeaderCellBase _CellObj
+        {
+            get
+            {
+                return CellObj;
+            }
+            set
+            {
+                if (CellObj == value) return;
+                CellObj = value;
+            }
+        }
     }
 }
