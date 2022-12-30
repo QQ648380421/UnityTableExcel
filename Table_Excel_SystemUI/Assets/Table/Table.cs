@@ -391,6 +391,17 @@ namespace XP.TableModel
             _ClearRows();
             _ClearColumns(); 
         }
-        
+
+        /// <summary>
+        /// 给单元格赋值
+        /// </summary>
+        /// <param name="column">单元格列</param>
+        /// <param name="row">单元格行</param>
+        /// <param name="data">要赋值的数据</param>
+        public virtual void _SetCellData(int column,int row,object data) {
+            var _cellData= this[column, row];
+            if (_cellData == null) return; 
+            _cellData._Data=data; 
+        }
     }
 }

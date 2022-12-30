@@ -101,9 +101,8 @@ namespace XP.TableModel.Test
                 yield return null;
               var _row=  _Table._AddRow();
                 for (int c = 0; c < _Table._HeaderColumn._HeaderCellDatas.Count; c++)
-                {//添加了行或列后，单元格数据肯定是空的，得给他们赋值
-                   var _cellData= _Table[c, _row._Index];
-                    _cellData._Data =c+ ","+_row._Index;
+                {//添加了行或列后，单元格数据肯定是空的，得给他们赋值 
+                    _Table._SetCellData(c, _row._Index, c + "," + _row._Index);
                 }
               
             }
@@ -117,9 +116,8 @@ namespace XP.TableModel.Test
                 yield return null; 
                 var _column =  _Table._AddColumn();
                 for (int r = 0; r < _Table._HeaderRow._HeaderCellDatas.Count; r++)
-                {
-                    var _cellData = _Table[_column._Index, r];
-                    _cellData._Data = _column._Index + "," + r;
+                { 
+                    _Table._SetCellData(_column._Index, r, _column._Index + "," + r);
                 }
 
             }
