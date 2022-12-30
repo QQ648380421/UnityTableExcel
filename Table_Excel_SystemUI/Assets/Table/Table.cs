@@ -1,20 +1,17 @@
-using System.Collections;
-using System.Collections.ObjectModel;
+using System;
 using System.Collections.Generic;
-using UnityEngine;
+using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.Linq;
+using UnityEngine;
 using UnityEngine.UI;
 using static XP.TableModel.Cell;
-using System;
-using XP.TableModel.Test;
-using System.Reflection;
 
 namespace XP.TableModel
 {
 
     /// <summary>
-    /// 表格//加反射
+    /// 表格
     /// </summary>
     public class Table : MonoBehaviour
     {
@@ -22,7 +19,14 @@ namespace XP.TableModel
         /// 当表格被点击时触发
         /// </summary>
         public event _CellClickDelegate _OnCellClickEvent;
-  
+        /// <summary>
+        /// 触发单元格被点击事件
+        /// </summary>
+        /// <param name="cellClickData"></param>
+        public virtual void _Invoke_OnCellClickEvent(CellClickData cellClickData)
+        {
+            _OnCellClickEvent?.Invoke(cellClickData);
+        }
         public CellData this[int x,int y]
         {
             get {
@@ -33,27 +37,46 @@ namespace XP.TableModel
         /// 单元格数据
         /// </summary>
         public readonly CellDataCollection _CellDatas = new CellDataCollection();
+ 
         /// <summary>
-        /// 最大行索引
+        /// 表头控制器
         /// </summary>
-        int _MaxRowIndex
+        public HeaderColumn _HeaderColumn;
+        /// <summary>
+        /// 表头控制器
+        /// </summary>
+        public HeaderRow _HeaderRow;
+        /// <summary>
+        /// 允许多选发生变化事件
+        /// </summary>
+        public event System.EventHandler<bool> _MultiSelectChangedEvent;
+        [SerializeField]
+        bool multiSelect;
+        /// <summary>
+        /// 允许多选
+        /// </summary>
+        public bool _MultiSelect
         {
             get
             {
-                return _HeaderRow._HeaderCellsCount;
+                return multiSelect;
             }
-        }
-        /// <summary>
-        /// 最大列索引
-        /// </summary>
-        int _MaxColumnIndex
-        {
-            get
+            set
             {
-                return _HeaderColumn._HeaderCellsCount;
+                if (multiSelect == value) return;
+                multiSelect = value;
+                _MultiSelectChangedEvent?.Invoke(this, value);
             }
-        }
+        } 
+        /// <summary>
+        /// 当前选中单元格数据，可以监听该字段里的<see cref="ObservableCollection.CollectionChanged"/>事件
+        /// </summary>
+        public readonly ObservableCollection<CellData> _CurrentSelectedCellDatas = new ObservableCollection<CellData>();
 
+        /// <summary>
+        /// 刷新表格事件
+        /// </summary>
+        public event EventHandler<Table> _OnRefreshEvent;
         ScrollRect scrollRect;
         /// <summary>
         /// 滚动容器组件
@@ -87,16 +110,7 @@ namespace XP.TableModel
         /// 单元格容器
         /// </summary>
         public CellView _CellView;
-        /// <summary>
-        /// 所有实例单元格
-        /// </summary>
-        public ObservableCollection<Cell> _Cells
-        {
-            get
-            {
-                return _CellView._Cells;
-            }
-        }
+ 
         /// <summary>
         /// 绑定列
         /// </summary>
@@ -142,28 +156,7 @@ namespace XP.TableModel
                 rowIndex++;
             } 
         }
-        ///// <summary>
-        ///// 绑定数据
-        ///// </summary>
-        //private void _BindData<T>(T data)
-        //{
-        //    if (data == null) return;
-        //    var _type= data.GetType();
-        //    var _properties = _type.GetProperties();
-        //    //先找出忽略的列
-        //    List<PropertyInfo> addPropertys = new List<PropertyInfo>();
-        //    foreach (var item in _properties)
-        //    {
-        //        if (!Attribute.IsDefined(item, typeof(ColumnAttribute))) continue;
-        //        Attribute.IsDefined(item,typeof(ColumnAttribute));
-        //        item.GetCustomAttributes();
-
-        //    }
-        //    for (int i = 0; i < length; i++)
-        //    {
-
-        //    } 
-        //}
+      
         /// <summary>
         /// 绑定数组数据
         /// </summary>
@@ -220,64 +213,7 @@ namespace XP.TableModel
             }
         }
  
-        /// <summary>
-        /// 表头控制器
-        /// </summary>
-        public HeaderColumn _HeaderColumn;
-        /// <summary>
-        /// 表头控制器
-        /// </summary>
-        public HeaderRow _HeaderRow;
-        /// <summary>
-        /// 允许多选发生变化事件
-        /// </summary>
-        public event System.EventHandler<bool> _MultiSelectChangedEvent;
-        [SerializeField]
-        bool multiSelect;
-        /// <summary>
-        /// 允许多选
-        /// </summary>
-        public bool _MultiSelect
-        {
-            get
-            {
-                return multiSelect;
-            }
-            set
-            {
-                if (multiSelect == value) return;
-                multiSelect = value;
-                _MultiSelectChangedEvent?.Invoke(this, value);
-            }
-        } 
-        /// <summary>
-        /// 当前选中单元格数据，可以监听该字段里的<see cref="ObservableCollection.CollectionChanged"/>事件
-        /// </summary>
-        public readonly ObservableCollection<CellData> _CurrentSelectedCellDatas = new ObservableCollection<CellData>();
-
-        /// <summary>
-        /// 刷新表格事件
-        /// </summary>
-        public event EventHandler<Table> _OnRefreshEvent;
-        /// <summary>
-        /// 获取行所有单元格
-        /// </summary>
-        /// <param name="row"></param>
-        /// <returns></returns>
-        public IEnumerable<Cell> _GetRowCells(int row)
-        {
-            return _Cells.Where(p => p._CellData._Row == row);
-        }
-        /// <summary>
-        /// 获取列所有单元格
-        /// </summary>
-        /// <param name="row"></param>
-        /// <returns></returns>
-        public IEnumerable<Cell> _GetColumCells(int colum)
-        {
-            return _Cells.Where(p => p._CellData._Column == colum);
-        }
-
+       
         /// <summary>
         /// 获取行所有单元格数据
         /// </summary>
@@ -318,58 +254,11 @@ namespace XP.TableModel
         }
          
         private void Awake()
-        {
-            _Cells.CollectionChanged -= _Cells_CollectionChanged;
-            _Cells.CollectionChanged += _Cells_CollectionChanged;
+        { 
             _CellDatas.CollectionChanged -= _CellDatas_CollectionChanged;
             _CellDatas.CollectionChanged += _CellDatas_CollectionChanged;
         }
-
-        /// <summary>
-        /// 单元格集合修改事件
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void _Cells_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
-        {
-            switch (e.Action)
-            {
-                case NotifyCollectionChangedAction.Add:
-                   var _addCell= e.NewItems[0] as Cell ;
-                    if (_addCell)
-                    {
-                        _addCell._OnCellClickEvent -= _addCell_OnCellClickEvent;
-                        _addCell._OnCellClickEvent += _addCell_OnCellClickEvent;
-                    }
-                    break;
-                case NotifyCollectionChangedAction.Move:
-                    break;
-                case NotifyCollectionChangedAction.Remove:
-                    var _removeCell = e.OldItems[0] as Cell;
-                    if (_removeCell)
-                    {
-                        _removeCell._OnCellClickEvent -= _addCell_OnCellClickEvent; 
-                    }
-                    break;
-                case NotifyCollectionChangedAction.Replace:
-                    break;
-                case NotifyCollectionChangedAction.Reset:
-                    break;
-                default:
-                    break;
-            }
-        }
-
-        /// <summary>
-        /// 单元格被点击事件
-        /// </summary>
-        /// <param name="selectable"></param>
-        /// <param name="eventData"></param>
-        private void _addCell_OnCellClickEvent( CellClickData cellClickData)
-        {
-            this._OnCellClickEvent?.Invoke(cellClickData);
-        }
-
+ 
 
         /// <summary>
         /// 当单元格列表发生变化时触发
@@ -424,9 +313,8 @@ namespace XP.TableModel
         /// <param name="columnCellData"></param>
         public HeaderCellData _AddColumn()
         {
-            HeaderCellData headerCellData = new HeaderCellData();
-            headerCellData._Index = _MaxColumnIndex;
-            headerCellData._Data = "Column" + headerCellData._Index;
+            HeaderCellData headerCellData = new HeaderCellData();  
+            headerCellData._Data = "Column" +  _HeaderColumn._HeaderCellDatas.Count;
             headerCellData._Size = 200;
             return _AddColumn(headerCellData);
         }
@@ -436,9 +324,8 @@ namespace XP.TableModel
         /// <param name="columnCellData"></param>
         public HeaderCellData _AddRow()
         {
-            HeaderCellData headerCellData = new HeaderCellData();
-            headerCellData._Index = _MaxRowIndex;
-            headerCellData._Data = "Row" + headerCellData._Index;
+            HeaderCellData headerCellData = new HeaderCellData(); 
+            headerCellData._Data = "Row" + _HeaderRow._HeaderCellDatas.Count;
             headerCellData._Size = 50;
             return _AddRow(headerCellData);
         }
@@ -504,12 +391,6 @@ namespace XP.TableModel
             _ClearRows();
             _ClearColumns(); 
         }
-        //private void Update()
-        //{
-        //    if (Input.GetKeyDown(KeyCode.Space))
-        //    {
-        //        _CellDatas[1, 1]._Data = "Hello!";
-        //    }
-        //}
+        
     }
 }

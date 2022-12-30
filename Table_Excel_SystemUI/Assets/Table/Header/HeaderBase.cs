@@ -81,9 +81,9 @@ namespace XP.TableModel
         public readonly ObservableCollection<HeaderCellData> _CurrentSelectHeaderCells = new ObservableCollection<HeaderCellData>();
 
         /// <summary>
-        /// 上次视图范围内显示的单元格缓存
+        /// 当前视图范围内显示的单元格缓存
         /// </summary>
-        protected List<HeaderCellData> _LastViewCellDatas=new List<HeaderCellData>();
+        public List<HeaderCellData> _CurrentViewCellDatas=new List<HeaderCellData>();
      
         /// <summary>
         /// 计算表头宽高大小
@@ -196,7 +196,7 @@ namespace XP.TableModel
         /// <summary>
         /// 更新所有单元格位置坐标索引
         /// </summary>
-        protected virtual void _ResetCellDatasPosition() {
+        public virtual void _ResetCellDatasPosition() {
           var _cellDatas=  _HeaderCellDatas.OrderBy(p=>p._Index);
             float pos =0;
             foreach (var item in _cellDatas)
@@ -211,7 +211,8 @@ namespace XP.TableModel
         /// <param name="columnCellData"></param>
         public virtual HeaderCellData _Add(HeaderCellData cellData)
         {
-            if (cellData == null) return null; 
+            if (cellData == null) return null;
+            cellData._Index = this._HeaderCellDatas.Count;
             _HeaderCellDatas.Add(cellData); 
             _ResetCellDatasPosition();
             cellData.PropertyChanged -= _HeaderCellData_PropertyChanged;
@@ -221,28 +222,35 @@ namespace XP.TableModel
             return cellData;
         }
         /// <summary>
+        /// 重置表头单元格位置
+        /// </summary>
+        public virtual void _ResetHeaderCellPosition() {
+            float pos = 0;
+            var _buffer = _HeaderCellDatas.OrderBy(p => p._Index).ToList();
+            for (int i = 0; i < _buffer.Count; i++)
+            {
+                var _item = _buffer[i];
+                _item._Position = pos;
+                pos += _item._Size;
+                if (_item._CellObj)
+                {
+                    _item._CellObj.OnCellDataChanged(_item);
+                }
+            }
+        }
+        /// <summary>
         /// 表头单元格数据内容发生变化
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
         private void _HeaderCellData_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
         {
-            if (e.PropertyName == nameof(HeaderCellData._Size))
+            if (e.PropertyName == nameof(HeaderCellData._Size) 
+                || e.PropertyName == nameof(HeaderCellData._Index)
+                )
             {//任何一个单元格大小发生了变化
                 //重新计算位置 
-                float pos = 0;
-                var _buffer = _HeaderCellDatas.OrderBy(p => p._Index).ToList();
-                for (int i = 0; i < _buffer.Count; i++)
-                {
-                    var _item = _buffer[i];
-                    _item._Position = pos;
-                    pos += _item._Size;
-                    if (_item._CellObj)
-                    {
-                        _item._CellObj.OnCellDataChanged(_item);
-                    }
-                }
-
+                _ResetHeaderCellPosition(); 
             }
            
           
@@ -272,7 +280,7 @@ namespace XP.TableModel
           
             //新的视图内单元格
             var _ViewCellDatasBuffer = _GetViewCellDatas(pos, viewSize).ToList(); 
-            var _removeCells = _LastViewCellDatas.Where(p => _ViewCellDatasBuffer.Contains(p) == false);
+            var _removeCells = _CurrentViewCellDatas.Where(p => _ViewCellDatasBuffer.Contains(p) == false);
              
             //移除单元格缓存
             Queue<HeaderCellData> _removeCellsQueue = new Queue<HeaderCellData>(_removeCells);
@@ -282,8 +290,8 @@ namespace XP.TableModel
             {
                 //新单元格
                 var _newCellData = _ViewCellDatasBuffer[i];
-                var _cell = _LastViewCellDatas.FirstOrDefault(p => p == _newCellData);
-                if (_cell != null)
+                var _cell = _CurrentViewCellDatas.FirstOrDefault(p => p == _newCellData);
+                if (_cell != null && _cell._CellObj)
                 {//还在显示，不用管  
                     _cell._CellObj._CellData = _newCellData; 
                     continue;
@@ -314,7 +322,9 @@ namespace XP.TableModel
                 } 
             }
           
-            _LastViewCellDatas = _ViewCellDatasBuffer;
+            _CurrentViewCellDatas = _ViewCellDatasBuffer;
+
+
         }
         protected virtual void Update()
         {
@@ -358,6 +368,11 @@ namespace XP.TableModel
         {
            var _findCellData= _HeaderCellDatas.FirstOrDefault(p=>p._Index==index);
             if (_findCellData == null) return;
+            var _cell= _HeaderCells.FirstOrDefault(p=>p._CellData== _findCellData);
+            if (_cell)
+            {//删除表头关联单元格
+                _cell._CellData = null;
+            } 
             _HeaderCellDatas.Remove(_findCellData);
             foreach (var item in _HeaderCellDatas)
             {

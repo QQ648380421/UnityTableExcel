@@ -79,11 +79,21 @@ namespace XP.TableModel
             {
                 if (columnAttributeData == value) return;
                 columnAttributeData = value;
+                this._Size = value._ColumnAttribute._Width;
+                if (!string.IsNullOrEmpty(value._ColumnAttribute._Name))
+                {
+                    this._Data = value._ColumnAttribute._Name;
+                }
+                else
+                {
+                    this._Data = value._PropertyInfo.Name;
+                }
+          
             }
         }
 
 
-        HeaderCellBase CellObj;
+        HeaderCellBase cellObj;
         /// <summary>
         /// 关联单元格物体
         /// </summary>
@@ -91,13 +101,27 @@ namespace XP.TableModel
         {
             get
             {
-                return CellObj;
+                return cellObj;
             }
             set
             {
-                if (CellObj == value) return;
-                CellObj = value;
+                if (cellObj == value) return;
+                cellObj = value;
             }
         }
+
+        /// <summary>
+        /// 获取当前显示状态
+        /// </summary>
+        /// <returns></returns>
+        public bool _GetShowState()
+        {
+            if (cellObj==null)
+            {
+                return false;
+            }
+            return true;
+        }
+     
     }
 }

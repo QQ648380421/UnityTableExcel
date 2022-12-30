@@ -92,24 +92,38 @@ namespace XP.TableModel.Test
             int.TryParse(_ValueInput.text, out x);  
             return x;
         }
+        
         private IEnumerator _AddRowClick()
         {
             var _count = _GetIndex();
             for (int i = 0; i < _count; i++)
             {
                 yield return null;
-                _Table._AddRow();
+              var _row=  _Table._AddRow();
+                for (int c = 0; c < _Table._HeaderColumn._HeaderCellDatas.Count; c++)
+                {//添加了行或列后，单元格数据肯定是空的，得给他们赋值
+                   var _cellData= _Table[c, _row._Index];
+                    _cellData._Data =c+ ","+_row._Index;
+                }
+              
             }
-
+       
         }
         private IEnumerator _AddColumnClick()
         {
             var _count = _GetIndex();
             for (int i = 0; i < _count; i++)
             {
-                yield return null;
-                _Table._AddColumn();
+                yield return null; 
+                var _column =  _Table._AddColumn();
+                for (int r = 0; r < _Table._HeaderRow._HeaderCellDatas.Count; r++)
+                {
+                    var _cellData = _Table[_column._Index, r];
+                    _cellData._Data = _column._Index + "," + r;
+                }
+
             }
+
         }
         private void _RemoveRowClick()
         { 

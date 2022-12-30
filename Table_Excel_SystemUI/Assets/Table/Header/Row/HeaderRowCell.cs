@@ -16,10 +16,7 @@ namespace XP.TableModel
     /// </summary>
     public class HeaderRowCell : HeaderCellBase
     {
-        public override HeaderCellData _CellData { get => base._CellData; set {
-                base._CellData = value;
-                if (value == null) return; 
-            } }
+   
 
         public override IEnumerable<CellData> GetCells()
         { 
@@ -70,6 +67,6 @@ namespace XP.TableModel
             }
         }
 
-       
+        
     }
 }

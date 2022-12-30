@@ -34,10 +34,7 @@ namespace XP.TableModel
                 _SetRectSize_X(value._ColumnAttribute._Width);
             }
         }
-        public override HeaderCellData _CellData { get => base._CellData; set {
-                base._CellData = value;
-                if (value == null) return;
-            } }
+    
 
         public override IEnumerable<CellData> GetCells()
         {

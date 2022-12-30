@@ -1,16 +1,14 @@
-using System.Collections;
-using System.Collections.Generic;
-using UnityEngine.UI;
-using UnityEngine;
-using static XP.TableModel.Cell;
-using UnityEngine.Events;
 using System;
+using System.Collections;
 using System.Linq;
+using UnityEngine;
+using UnityEngine.Events;
 using UnityEngine.EventSystems;
+using UnityEngine.UI;
+using static XP.TableModel.Cell;
 
 namespace XP.TableModel
 {
-  
     [Serializable]
     public class CellDataEvent : UnityEvent<object> { }
     public delegate void _CellDataChanged(Cell _cell, CellData _cellData);
@@ -208,13 +206,7 @@ namespace XP.TableModel
             }
            
         }
-  
-
-        /// <summary>
-        /// 行单元格发生变化
-        /// </summary>
-        public event _CellBaseChangedDelegate _RowCellChangedEvent;
-
+   
         HeaderBase column;
         /// <summary>
         /// 关联列
@@ -233,6 +225,45 @@ namespace XP.TableModel
 
 
         HeaderBase row;
+
+
+        HeaderCellData columnCellData;
+        /// <summary>
+        /// 关联行单元格数据
+        /// </summary>
+        public HeaderCellData _ColumnCellData
+        {
+            get
+            {
+                return columnCellData;
+            }
+            set
+            {
+                if (columnCellData == value) return;
+                columnCellData = value;
+                if (value == null) return;
+                columnCell = value._CellObj;
+            }
+        }
+        HeaderCellData rowCellData;
+        /// <summary>
+        /// 关联行单元格数据
+        /// </summary>
+        public HeaderCellData _RowCellData
+        {
+            get
+            {
+                return rowCellData;
+            }
+            set
+            {
+                if (rowCellData == value) return;
+                rowCellData = value;
+                if (value == null) return;
+                rowCell = value._CellObj;
+            }
+        }
+         
         /// <summary>
         /// 关联行
         /// </summary>
@@ -257,16 +288,7 @@ namespace XP.TableModel
             get
             {
                 return columnCell;
-            }
-            set
-            {
-                if (columnCell == value) return;
-               
-                columnCell = value;
-                _UpdatePos();
-                _ColumnCellChangedEvent?.Invoke(this,value);
-             
-            }
+            } 
         }
 
         HeaderCellBase rowCell;
@@ -278,25 +300,9 @@ namespace XP.TableModel
             get
             {
                 return rowCell;
-            }
-            set
-            {
-                if (rowCell == value) return;
-              
-                rowCell = value;
-                _UpdatePos();
-                _RowCellChangedEvent?.Invoke(this, value);
-           
-
-            }
+            } 
         }
- 
-
-        /// <summary>
-        /// 列单元格发生变化
-        /// </summary>
-        public event _CellBaseChangedDelegate _ColumnCellChangedEvent;
-
+  
         /// <summary>
         /// 刷新所在位置
         /// </summary>
@@ -320,35 +326,7 @@ namespace XP.TableModel
             _RectTransform.anchoredPosition = pos;
             _RectTransform.sizeDelta = size;
         }
-
-        /// <summary>
-        /// 等待一帧刷新位置
-        /// </summary>
-        /// <returns></returns>
-        private IEnumerator _YieldUpdatePos()
-        {
-            yield return null;
-            _UpdatePos(); 
-        }
-
-
-        /// <summary>
-        /// 列和行的显示状态发生变化
-        /// </summary>
-        /// <param name="cell"></param>
-        /// <param name="isInsideBoundary"></param>
-        private void _ColumnAndRowCell__IsInsideBoundaryChangedEvent(HeaderCellBase cell, bool isInsideBoundary)
-        {
-            if (isInsideBoundary==false)
-            {//没销毁*********************** 
-                //销毁自己 
-                if (this)
-                {
-                    Destroy(this.gameObject);
-                } 
-            }
-        }
-
+         
         /// <summary>
         /// <see cref="_Data"/>发生变化时触发
         /// </summary>
@@ -481,7 +459,7 @@ namespace XP.TableModel
             {
                 cellData._Invoke_OnCellDataClickEvent(cellClickData);
             }
-
+            _Table._Invoke_OnCellClickEvent(cellClickData);
         }
 
         /// <summary>
@@ -512,7 +490,7 @@ namespace XP.TableModel
                 if (_CellData._Cell!=this)
                 { 
                     _CellData._Cell = this;
-                }
+                } 
             }
         
         }
@@ -521,7 +499,7 @@ namespace XP.TableModel
         /// </summary>
         public virtual  void _Initialization() {
             cellData = null;
-            StartCoroutine(_YieldUpdatePos());
+            _UpdatePos(); 
             if (_Table) _Table__MultiSelectChangedEvent(_Table, _Table._MultiSelect);
             _UpdateData();
         }

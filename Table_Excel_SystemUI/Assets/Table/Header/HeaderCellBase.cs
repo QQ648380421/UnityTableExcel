@@ -55,24 +55,16 @@ namespace XP.TableModel
                 }
                 cellData = value; 
                 _OnCellDataChangeEvent?.Invoke(this, value);
-                if (value!=null)
-                {
-                    Debug.Log(value._Index, this);
-                }
-                else
-                {
-                    Debug.Log(this, this);
-                }
-              
-                if (value == null) {
-                    
-                    Destroy(this.gameObject);
+             
+                if (value == null || value._CellObj) { 
+                    Destroy(this.gameObject); 
                     return;
                 }
+               
                 value._CellObj = this;
                 value.PropertyChanged -= _CellData_PropertyChanged;
-                value.PropertyChanged += _CellData_PropertyChanged; 
-                SetIsOnWithoutNotify(value._Selected);
+                value.PropertyChanged += _CellData_PropertyChanged;
+                SetIsOnWithoutNotify(value._Selected); 
                 OnCellDataChanged(value);
                 if (value._Data == null)
                 { 
@@ -191,8 +183,7 @@ namespace XP.TableModel
             }
             else if (e.PropertyName == nameof(HeaderCellData._Index))
             {
-                //transform.SetSiblingIndex(_CellData._Index);
-                //Debug.Log(transform.parent.name+ " "+name+ " SetSiblingIndex:"+ transform.GetSiblingIndex()+" Index:"+ _CellData._Index,this);
+               
             }
         }
         protected override void Awake()
@@ -239,6 +230,16 @@ namespace XP.TableModel
         /// <param name="value"></param>
         protected virtual void _IsOnChangedListener(bool value)
         {
+            if (cellData == null) return;
+            cellData._Selected = value;
+            if (value)
+            {//先清除已选中，否则被物体被删除
+                foreach (var item in _HeaderBase._CurrentSelectHeaderCells)
+                {
+                    item._Selected = false;
+                }
+                _HeaderBase._CurrentSelectHeaderCells.Clear();
+            }
             if (_HeaderBase)
             {
                 if (value)
