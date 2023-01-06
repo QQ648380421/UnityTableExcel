@@ -48,7 +48,11 @@ namespace XP.TableModel
         /// <summary>
         /// 单元格预制体
         /// </summary>
-        public Cell _CellPrefab;
+        public Cell _CellPrefab {
+            get {
+                return _Table._CellPrefab;
+            }
+        }
    
         /// <summary>
         /// 注册事件
