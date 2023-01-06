@@ -8,16 +8,18 @@ namespace XP.TableModel
     public class UnitEditorWindow : EditorWindow {
   
         private bool _hide = false; 
+ 
         public static void Open() { 
-            UnitEditorWindow _window =  CreateInstance(typeof(UnitEditorWindow)) as UnitEditorWindow; 
-            _window.ShowModal(); 
+            UnitEditorWindow _window =  CreateInstance(typeof(UnitEditorWindow)) as UnitEditorWindow;
+          
+            _window.ShowModalUtility(); 
         }
 
      
         private void OnEnable()
         {
             titleContent = new GUIContent(DateTime.Now.Ticks.ToString());
-          
+            this.position = new Rect(500,400,600,300);
         }
         private void OnDisable()
         {
