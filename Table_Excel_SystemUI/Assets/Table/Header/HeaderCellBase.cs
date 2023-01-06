@@ -40,6 +40,10 @@ namespace XP.TableModel
         /// </summary>
         /// <param name="data"></param>
         public abstract void OnCellDataChanged(HeaderCellData data);
+        /// <summary>
+        /// 重置刷新单元格坐标
+        /// </summary>
+        public abstract void _ResetPosition(HeaderCellData data);
         HeaderCellData cellData;
         /// <summary>
         /// 单元格数据
@@ -168,7 +172,7 @@ namespace XP.TableModel
         private void _CellData_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
         {
             if (_CellData == null) return;
-
+       
             if (e.PropertyName == nameof(HeaderCellData._Data))
             {
                 if (_CellData._Data == null)
@@ -181,10 +185,12 @@ namespace XP.TableModel
                 }
 
             }
-            else if (e.PropertyName == nameof(HeaderCellData._Index))
-            {
-               
+            else if (e.PropertyName == nameof(HeaderCellData._Position)
+                || e.PropertyName == nameof(HeaderCellData._Size))
+            {//宽高大小发生变化，让子级重置一下宽高大小
+                _ResetPosition(this._CellData); 
             }
+          
         }
         protected override void Awake()
         {
@@ -320,7 +326,7 @@ namespace XP.TableModel
         /// <summary>
         /// 刷新宽高大小
         /// </summary>
-        public abstract void UpdateRectSize();
+        public abstract void _ResetDataSize();
 
         /// <summary>
         /// 拖拽按钮结束
@@ -329,8 +335,11 @@ namespace XP.TableModel
         /// <param name="e"></param>
         protected void _DragButton__OnEndDragEvent(object sender, UnityEngine.EventSystems.PointerEventData e)
         { 
-            UpdateRectSize();
+            _HeaderBase._ResetCellDatasPosition();
             _HeaderBase._ResetCellContentSize();
+            _ResetDataSize();
+            //刷新该行或列的所有单元格
+            _HeaderBase._ResetHeaderCellPosition();
         }
         public override void OnPointerClick(PointerEventData eventData)
         {

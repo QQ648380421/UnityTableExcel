@@ -201,7 +201,7 @@ namespace XP.TableModel
             float pos =0;
             foreach (var item in _cellDatas)
             {
-                item._Position = pos;
+                item._Position = pos; 
                 pos += item._Size; 
             }
         }
@@ -237,7 +237,13 @@ namespace XP.TableModel
                     _item._CellObj.OnCellDataChanged(_item);
                 }
             }
+            foreach (var item in _HeaderCells)
+            {
+                item._ResetPosition(item._CellData);
+            }
         }
+
+        
         /// <summary>
         /// 表头单元格数据内容发生变化
         /// </summary>
@@ -280,7 +286,7 @@ namespace XP.TableModel
           
             //新的视图内单元格
             var _ViewCellDatasBuffer = _GetViewCellDatas(pos, viewSize).ToList(); 
-            var _removeCells = _CurrentViewCellDatas.Where(p => _ViewCellDatasBuffer.Contains(p) == false);
+            var _removeCells = _CurrentViewCellDatas.Where(p => _ViewCellDatasBuffer.Contains(p) == false || p._CellObj==null);
              
             //移除单元格缓存
             Queue<HeaderCellData> _removeCellsQueue = new Queue<HeaderCellData>(_removeCells);

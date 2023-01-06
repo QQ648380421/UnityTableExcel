@@ -114,11 +114,10 @@ namespace XP.TableModel
         /// <summary>
         /// 绑定列
         /// </summary>
-        private void _BindColumns(List<ColumnAttributeData>  columnAttributeDatas) {
-            var _columnMax= columnAttributeDatas.Max(p=>p._ColumnAttribute._Index);
-            for (int i = 0; i < _columnMax; i++)
-            {
-             var _column=   _AddColumn();
+        private void _BindColumns(List<ColumnAttributeData>  columnAttributeDatas) { 
+            for (int i = 0; i < columnAttributeDatas.Count; i++)
+            { 
+               var _column=   _AddColumn();
                 var columnData= columnAttributeDatas.FirstOrDefault(p=>p._ColumnAttribute._Index==i); 
                 _column._ColumnAttributeData = columnData; 
             } 
@@ -325,7 +324,7 @@ namespace XP.TableModel
         public HeaderCellData _AddRow()
         {
             HeaderCellData headerCellData = new HeaderCellData(); 
-            headerCellData._Data = "Row" + _HeaderRow._HeaderCellDatas.Count;
+            headerCellData._Data =  _HeaderRow._HeaderCellDatas.Count+1;
             headerCellData._Size = 50;
             return _AddRow(headerCellData);
         }

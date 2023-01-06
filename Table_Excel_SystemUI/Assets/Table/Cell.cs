@@ -81,7 +81,7 @@ namespace XP.TableModel
             else
             if (e.PropertyName == nameof(CellData._Cell))
             {//数据发生变化
-                if (cellData._Cell==null)
+                if (cellData._Cell==null &&this!=null)
                 {
                     cellData._Cell = this;
                 }

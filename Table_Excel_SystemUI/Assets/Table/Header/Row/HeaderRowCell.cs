@@ -23,21 +23,15 @@ namespace XP.TableModel
           return  _Table._CellDatas._GetRowCellDatas(_CellData._Index) ;
         }
 
-        public override void UpdateRectSize()
+        public override void _ResetDataSize()
         {
             if (_CellData == null) return;
             _CellData._Size = _RectTransform.sizeDelta.y;
         }
 
         public override void OnCellDataChanged(HeaderCellData data)
-        {
-            var _size = _RectTransform.sizeDelta;
-            _size.y = data._Size;
-            _RectTransform.sizeDelta = _size;
-
-            var _pos = _RectTransform.anchoredPosition;
-            _pos.y = -data._Position;
-            _RectTransform.anchoredPosition = _pos; 
+        { 
+            _ResetPosition(data);
         }
 
         protected override void _IsOnChanged(bool value)
@@ -67,6 +61,15 @@ namespace XP.TableModel
             }
         }
 
-        
+        public override void _ResetPosition(HeaderCellData data)
+        {
+            var _size = _RectTransform.sizeDelta;
+            _size.y = data._Size;
+            _RectTransform.sizeDelta = _size;
+
+            var _pos = _RectTransform.anchoredPosition;
+            _pos.y = -data._Position;
+            _RectTransform.anchoredPosition = _pos;
+        }
     }
 }
