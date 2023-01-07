@@ -24,7 +24,18 @@ namespace XP.TableModel
         private IEnumerator _ResetCellContentSize_Async() {
             yield return new WaitForEndOfFrame();
             var __cellContentSize = _Table._CellContent.sizeDelta;
-            __cellContentSize.x = _RectTransform.sizeDelta.x;
+            float _addOffsetSize = 0;
+            if (_Table._ScrollRect.verticalScrollbar)
+            {
+                var _verticalScrollbarRect = (RectTransform)_Table._ScrollRect.verticalScrollbar.transform; 
+                var _cellViewRect = _Table._CellView._Mask.rectTransform;
+                if (_RectTransform.sizeDelta.x >= _cellViewRect.rect.width)
+                {
+                    _addOffsetSize = _verticalScrollbarRect.sizeDelta.x;
+                }
+            }
+    
+            __cellContentSize.x = _RectTransform.sizeDelta.x + _addOffsetSize; 
             _Table._CellContent.sizeDelta = __cellContentSize;
             _Invoke_RectSizeChangedEvent();
         } 

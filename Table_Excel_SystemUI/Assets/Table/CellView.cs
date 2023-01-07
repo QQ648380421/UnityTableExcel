@@ -28,7 +28,7 @@ namespace XP.TableModel
             }
         }
 
-
+        Mask mask;
         ToggleGroup toggleGroup;
         public ToggleGroup _ToggleGroup
         {
@@ -53,7 +53,17 @@ namespace XP.TableModel
                 return _Table._CellPrefab;
             }
         }
-   
+        /// <summary>
+        /// ¸¸¼¶ÕÚÕÖ
+        /// </summary>
+        public Mask _Mask { get {
+                if (!mask)
+                {
+                    mask = GetComponentInParent<Mask>();
+                }
+                return mask;
+            }  }
+
         /// <summary>
         /// ×¢²áÊÂ¼þ
         /// </summary>

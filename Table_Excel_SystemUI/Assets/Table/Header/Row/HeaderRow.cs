@@ -26,7 +26,18 @@ namespace XP.TableModel
         {
             yield return new WaitForEndOfFrame();
             var __cellContentSize = _Table._CellContent.sizeDelta;
-            __cellContentSize.y= _RectTransform.sizeDelta.y;
+  
+            float _addOffsetSize = 0;
+            if (_Table._ScrollRect.horizontalScrollbar)
+            {
+                var _horizontalScrollbarRect = (RectTransform)_Table._ScrollRect.horizontalScrollbar.transform;
+                var _cellViewRect = _Table._CellView._Mask.rectTransform;
+                if (_RectTransform.sizeDelta.y >= _cellViewRect.rect.height)
+                {
+                    _addOffsetSize = _horizontalScrollbarRect.sizeDelta.y;
+                }
+            }
+            __cellContentSize.y = _RectTransform.sizeDelta.y+ _addOffsetSize;
             _Table._CellContent.sizeDelta = __cellContentSize;
             _Invoke_RectSizeChangedEvent();
         }
