@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Linq;
+using System.Text;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.EventSystems;
@@ -58,7 +59,11 @@ namespace XP.TableModel
                 SetIsOnWithoutNotify(value._Selected);//设置选择框状态
                 value.PropertyChanged -= Value_PropertyChanged;
                 value.PropertyChanged += Value_PropertyChanged;
-                name = value._Column+","+value._Row;
+                StringBuilder str = new StringBuilder();
+                str.Append(value._Column.ToString());
+                str.Append(",");
+                str.Append(value._Row.ToString());
+                name = str.ToString();
            
             }  }
 
@@ -215,9 +220,9 @@ namespace XP.TableModel
         {
             get
             {
-                if (columnCell)
+                if (_ColumnCell)
                 {
-                    column = columnCell._HeaderBase; 
+                    column = _ColumnCell._HeaderBase; 
                 }
                 return column;
             } 
@@ -240,9 +245,7 @@ namespace XP.TableModel
             set
             {
                 if (columnCellData == value) return;
-                columnCellData = value;
-                if (value == null) return;
-                columnCell = value._CellObj;
+                columnCellData = value; 
             }
         }
         HeaderCellData rowCellData;
@@ -258,9 +261,7 @@ namespace XP.TableModel
             set
             {
                 if (rowCellData == value) return;
-                rowCellData = value;
-                if (value == null) return;
-                rowCell = value._CellObj;
+                rowCellData = value; 
             }
         }
          
@@ -271,15 +272,14 @@ namespace XP.TableModel
         {
             get
             {
-                if (rowCell)
+                if (_RowCell)
                 {
-                    row = rowCell._HeaderBase; 
+                    row = _RowCell._HeaderBase; 
                 }
                 return row;
             } 
         }
-
-        HeaderCellBase columnCell;
+         
         /// <summary>
         /// 关联列单元格
         /// </summary>
@@ -287,11 +287,14 @@ namespace XP.TableModel
         {
             get
             {
-                return columnCell;
+                if (columnCellData == null)
+                {
+                    return null;
+                }
+                return columnCellData._CellObj;
             } 
         }
-
-        HeaderCellBase rowCell;
+         
         /// <summary>
         /// 关联行单元格
         /// </summary>
@@ -299,29 +302,33 @@ namespace XP.TableModel
         {
             get
             {
-                return rowCell;
+                if (rowCellData==null)
+                {
+                    return null;
+                }
+                return rowCellData._CellObj;
             } 
         }
   
         /// <summary>
         /// 刷新所在位置
         /// </summary>
-        private void _UpdatePos()
+        public void _UpdatePos()
         {
             Vector2 pos= _RectTransform.anchoredPosition
                         , size= _RectTransform.sizeDelta;
 
-            if (rowCell)
+            if (_RowCell)
             {//行
-                pos.y = rowCell._RectTransform.anchoredPosition.y; 
+                pos.y = _RowCell._RectTransform.anchoredPosition.y; 
                 
-                size.y = rowCell._RectTransform.sizeDelta.y; 
+                size.y = _RowCell._RectTransform.sizeDelta.y; 
               
             }
-            if (columnCell)
+            if (_ColumnCell)
             {
-                pos.x = columnCell._RectTransform.anchoredPosition.x;  
-                size.x= columnCell._RectTransform.sizeDelta.x;  
+                pos.x = _ColumnCell._RectTransform.anchoredPosition.x;  
+                size.x= _ColumnCell._RectTransform.sizeDelta.x;  
             }
             _RectTransform.anchoredPosition = pos;
             _RectTransform.sizeDelta = size;
@@ -361,6 +368,7 @@ namespace XP.TableModel
                 _Table._HeaderRow._OnRectSizeChangedEvent += _Header__OnRectSizeChangedEvent;
                 _Table._OnRefreshEvent += _Table__OnRefreshEvent;
                 _Table._MultiSelectChangedEvent += _Table__MultiSelectChangedEvent;
+                _Table__MultiSelectChangedEvent(_Table, _Table._MultiSelect);
 
             }
             this.onValueChanged.AddListener(_IsOnValueChanged); 
@@ -481,7 +489,7 @@ namespace XP.TableModel
             { 
                 _CellData = _Table._CellDatas[_index]; 
                 if (_CellData==null)
-                {
+                { 
                     Destroy(this.gameObject);
                     return;
                 }
@@ -500,28 +508,29 @@ namespace XP.TableModel
         public virtual  void _Initialization() {
             cellData = null;
             _UpdatePos(); 
-            if (_Table) _Table__MultiSelectChangedEvent(_Table, _Table._MultiSelect);
             _UpdateData();
         }
         protected override void Start()
         {
             base.Start();
-            _RegisterEvents();
+        
+            _RegisterEvents(); 
             _Initialization();
         }
 
-        private void Update()
-        {
-            if (!Application.isPlaying) return;
-            if (!_ColumnCell)
-            {
-                Destroy(gameObject);
-            } else
-            if (!_RowCell)
-            {
-                Destroy(gameObject);
-            } 
-        }
+        //private void Update()
+        //{
+        //    if (!Application.isPlaying) return;
+        //    if (!_ColumnCell)
+        //    {
+        //        Destroy(gameObject);
+        //    }
+        //    else
+        //    if (!_RowCell)
+        //    {
+        //        Destroy(gameObject);
+        //    }
+        //}
         
         protected override void OnDestroy()
         {
@@ -535,8 +544,7 @@ namespace XP.TableModel
             {
                 cellData.PropertyChanged -= Value_PropertyChanged;
                 cellData._Cell = null;
-            }
-            
+            } 
         }
 
     }

@@ -128,8 +128,8 @@ namespace XP.TableModel
             _min.y = _yCellDatas == null || _yCellDatas.Count <= 0 ? 0 : _yCellDatas.Min(p => p._Index);
             _max.x = _xCellDatas == null || _xCellDatas.Count <= 0 ? 0 : _xCellDatas.Max(p => p._Index);
             _max.y = _yCellDatas == null || _yCellDatas.Count <= 0 ? 0 : _yCellDatas.Max(p => p._Index);
-
-         var _removeCells=    _Cells.Where(
+          
+             var _removeCells=    _Cells.Where(
                 p=>p!=null && p._CellData==null ||
                !(
                 p._CellData._Column >= _min.x && p._CellData._Column <= _max.x
@@ -137,7 +137,7 @@ namespace XP.TableModel
                  p._CellData._Row >= _min.y && p._CellData._Row <= _max.y
                )
                 );
-
+         
             Queue<Cell> _removeCellsQueue = new Queue<Cell>(_removeCells);
 
             for (int x = 0; x < _xCellDatas.Count; x++)
@@ -169,20 +169,25 @@ namespace XP.TableModel
         {
             var _cell= _Cells.FirstOrDefault(p=>p._ColumnCellData== column && p._RowCellData==row);
             //缓存中还在，不用管
-            if (_cell) return;
+            if (_cell) {
+                _cell._ColumnCellData = column;
+                _cell._RowCellData = row;
+                _cell._Initialization();
+                return;
+            }
             Cell cell=null;
             if (removeCells.Count>0)
             {
                 cell = removeCells.Dequeue();
                 cell._ColumnCellData = column;
                 cell._RowCellData = row;
-
+                cell._Initialization();
             }
             else
             {
                 cell = CreatePrefab(column, row);
             }
-            cell._Initialization();
+           
 
         }
 
