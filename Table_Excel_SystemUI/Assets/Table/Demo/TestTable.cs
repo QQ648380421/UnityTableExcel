@@ -72,7 +72,7 @@ namespace XP.TableModel.Test
             int index = 0;
             foreach (var item in _Table._CellDatas)
             {
-                item._Data = index; 
+                item._ShowData = index; 
                 index++;
             }
 
@@ -83,7 +83,7 @@ namespace XP.TableModel.Test
         private void __ChangeSelectText() {
             foreach (var item in _Table._CurrentSelectedCellDatas)
             { 
-                item._Data = _ValueInput.text;
+                item._ShowData = _ValueInput.text;
             }
         }
         private int _GetIndex()

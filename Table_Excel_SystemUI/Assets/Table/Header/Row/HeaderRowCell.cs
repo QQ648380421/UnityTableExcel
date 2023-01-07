@@ -63,6 +63,7 @@ namespace XP.TableModel
 
         public override void _ResetPosition(HeaderCellData data)
         {
+            if (data == null) return;
             var _size = _RectTransform.sizeDelta;
             _size.y = data._Size;
             _RectTransform.sizeDelta = _size;

@@ -27,10 +27,10 @@ namespace XP.TableModel
                 columnAttributeData = value;
                 if (value == null)
                 {
-                    _CellData._Data = string.Empty;
+                    _CellData._ShowData = string.Empty;
                     return;
                 }
-                _CellData._Data = value._ColumnAttribute._Name;
+                _CellData._ShowData = value._ColumnAttribute._Name;
                 _SetRectSize_X(value._ColumnAttribute._Width);
             }
         }
@@ -83,6 +83,7 @@ namespace XP.TableModel
 
         public override void _ResetPosition(HeaderCellData data)
         {
+            if (data == null) return;
             var _size = _RectTransform.sizeDelta;
             _size.x = data._Size;
             _RectTransform.sizeDelta = _size;

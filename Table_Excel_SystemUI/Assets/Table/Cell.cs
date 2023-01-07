@@ -34,9 +34,9 @@ namespace XP.TableModel
         /// </summary>
         private void _CellData_DataPropertyChanged() {
             string dataStr = string.Empty;
-            if (cellData != null && cellData._Data != null)
+            if (cellData != null && cellData._ShowData != null)
             {
-                dataStr = cellData._Data.ToString();
+                dataStr = cellData._ShowData.ToString();
             }
             _CellDataChangedEvents_String?.Invoke(dataStr);
             _CellDataChangeEvent?.Invoke(this,cellData);
@@ -79,7 +79,7 @@ namespace XP.TableModel
             {//选中状态发生变化
                 SetIsOnWithoutNotify(cellData._Selected);//设置选择框状态 
             }else
-            if (e.PropertyName == nameof(CellData._Data))
+            if (e.PropertyName == nameof(CellData._ShowData))
             {//数据发生变化
                 _CellData_DataPropertyChanged();
             }
@@ -119,7 +119,8 @@ namespace XP.TableModel
             base.OnPointerClick(eventData);
             var _cellClickData= new CellClickData() { 
              _Selectable=this,
-              _EventData= eventData
+              _EventData= eventData,
+               _Cell=this
             }; 
             _OnCellClickEvent?.Invoke(_cellClickData);
            

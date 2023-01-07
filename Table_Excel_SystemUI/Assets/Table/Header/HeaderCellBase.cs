@@ -70,14 +70,14 @@ namespace XP.TableModel
                 value.PropertyChanged += _CellData_PropertyChanged;
                 SetIsOnWithoutNotify(value._Selected); 
                 OnCellDataChanged(value);
-                if (value._Data == null)
+                if (value._ShowData == null)
                 { 
                     _OnCellNameChanged?.Invoke(string.Empty);
                 }
                 else
                 {
                     name = value._Index.ToString();
-                    _OnCellNameChanged?.Invoke(value._Data.ToString());
+                    _OnCellNameChanged?.Invoke(value._ShowData.ToString());
                 }
 
             }
@@ -173,15 +173,15 @@ namespace XP.TableModel
         {
             if (_CellData == null) return;
        
-            if (e.PropertyName == nameof(HeaderCellData._Data))
+            if (e.PropertyName == nameof(HeaderCellData._ShowData))
             {
-                if (_CellData._Data == null)
+                if (_CellData._ShowData == null)
                 {
                     _OnCellNameChanged?.Invoke(string.Empty);
                 }
                 else
                 {
-                    _OnCellNameChanged?.Invoke(_CellData._Data.ToString());
+                    _OnCellNameChanged?.Invoke(_CellData._ShowData.ToString());
                 }
 
             }
@@ -347,7 +347,8 @@ namespace XP.TableModel
             _OnHeaderCellClickEvent?.Invoke(new CellClickData()
             {
                 _Selectable = this,
-                _EventData = eventData
+                _EventData = eventData,
+                 _HeaderCell=this
             });
         }
 

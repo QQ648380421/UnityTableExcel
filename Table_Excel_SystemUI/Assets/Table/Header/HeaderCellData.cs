@@ -82,11 +82,11 @@ namespace XP.TableModel
                 this._Size = value._ColumnAttribute._Width;
                 if (!string.IsNullOrEmpty(value._ColumnAttribute._Name))
                 {
-                    this._Data = value._ColumnAttribute._Name;
+                    this._ShowData = value._ColumnAttribute._Name;
                 }
                 else
                 {
-                    this._Data = value._PropertyInfo.Name;
+                    this._ShowData = value._PropertyInfo.Name;
                 }
           
             }

@@ -135,7 +135,8 @@ namespace XP.TableModel
             var _attributeData = rowAttributeDatas.FirstOrDefault(p => p._ColumnAttribute._Index == cellData._Column); 
             if (_attributeData == null) return; 
              var _data=  _attributeData._PropertyInfo.GetValue(item);
-            cellData._Data = _data; 
+            cellData._ShowData = _data;
+            cellData._Data = item;
         }
         /// <summary>
         /// 绑定行数据
@@ -313,7 +314,7 @@ namespace XP.TableModel
         public HeaderCellData _AddColumn()
         {
             HeaderCellData headerCellData = new HeaderCellData();  
-            headerCellData._Data = "Column" +  _HeaderColumn._HeaderCellDatas.Count;
+            headerCellData._ShowData = "Column" +  _HeaderColumn._HeaderCellDatas.Count;
             headerCellData._Size = 200;
             return _AddColumn(headerCellData);
         }
@@ -324,7 +325,7 @@ namespace XP.TableModel
         public HeaderCellData _AddRow()
         {
             HeaderCellData headerCellData = new HeaderCellData(); 
-            headerCellData._Data =  _HeaderRow._HeaderCellDatas.Count+1;
+            headerCellData._ShowData =  _HeaderRow._HeaderCellDatas.Count+1;
             headerCellData._Size = 50;
             return _AddRow(headerCellData);
         }
@@ -396,11 +397,13 @@ namespace XP.TableModel
         /// </summary>
         /// <param name="column">单元格列</param>
         /// <param name="row">单元格行</param>
-        /// <param name="data">要赋值的数据</param>
-        public virtual void _SetCellData(int column,int row,object data) {
+        /// <param name="showData">要显示的数据</param>
+        ///        /// <param name="data">该单元格关联的数据</param>
+        public virtual void _SetCellData(int column,int row,object showData,object data=null) {
             var _cellData= this[column, row];
             if (_cellData == null) return; 
-            _cellData._Data=data; 
+            _cellData._ShowData=showData;
+            _cellData._Data = data;
         }
     }
 }

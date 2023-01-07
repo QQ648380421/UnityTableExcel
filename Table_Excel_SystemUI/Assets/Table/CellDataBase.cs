@@ -20,6 +20,30 @@ namespace XP.TableModel {
         /// 操作的类型数据
         /// </summary>
         public PointerEventData _EventData { get => eventData; set => eventData = value; }
+        /// <summary>
+        /// 被点击的单元格
+        /// </summary>
+        public Cell _Cell { get => cell; set => cell = value; }
+
+        Cell cell ;
+         
+        HeaderCellBase headerCell;
+        /// <summary>
+        /// 被点击的表头
+        /// </summary>
+        public HeaderCellBase _HeaderCell
+        {
+            get
+            {
+                return headerCell;
+            }
+            set
+            {
+                if (headerCell == value) return;
+                headerCell = value;
+            }
+        }
+
     }
     /// <summary>
     /// 单元格点击委托
@@ -51,19 +75,29 @@ namespace XP.TableModel {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
         }
 
+        object showData;
+        /// <summary>
+        /// 单元格显示数据，显示你传入的数据，可以转化成你想要的，可以重写<see cref="object.ToString()"/>
+        /// </summary>
+        public virtual object _ShowData
+        {
+            get => showData; set
+            {
+                if (showData == value) return;
+                showData = value;
+                _InvokePropertyChanged(nameof(_ShowData));
+            }
+        }
         object data;
         /// <summary>
-        /// 单元格数据，你传入的数据，可以转化成你想要的，可以重写<see cref="object.ToString()"/>
+        /// 与该单元格相关联的数据
         /// </summary>
-        public virtual object _Data
-        {
-            get => data; set
-            {
+        public object _Data { get => data; set {
                 if (data == value) return;
                 data = value;
                 _InvokePropertyChanged(nameof(_Data));
-            }
-        }
+            } }
+
         bool selected;
         /// <summary>
         /// 选中单元格
@@ -100,6 +134,7 @@ namespace XP.TableModel {
                 _InvokePropertyChanged(nameof(_Selected));
             }
         }
-         
+
+  
     }
 }

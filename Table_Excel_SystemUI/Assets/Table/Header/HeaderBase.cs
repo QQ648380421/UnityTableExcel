@@ -239,6 +239,7 @@ namespace XP.TableModel
             }
             foreach (var item in _HeaderCells)
             {
+                if (!item) continue;
                 item._ResetPosition(item._CellData);
             }
         }
