@@ -143,9 +143,9 @@ namespace XP.TableModel
 
                     //ÉèÖÃ¹ö¶¯ÈÝÆ÷×ó±ßÎ»ÖÃ
                     var scroll_Row_Rect = _HeaderRowScrollbar.transform as RectTransform;
-                    _columnV2.x= scroll_Row_Rect.offsetMin.x;
-                    _columnV2.y = buttonSize.y;
-                    scroll_Row_Rect.offsetMin = _columnV2;
+                    _columnV2.x= scroll_Row_Rect.offsetMax.x;
+                    _columnV2.y = -buttonSize.y;
+                    scroll_Row_Rect.offsetMax = _columnV2;
                     break;
                 default:
                     break;
