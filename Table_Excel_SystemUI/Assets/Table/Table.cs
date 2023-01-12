@@ -131,10 +131,12 @@ namespace XP.TableModel
         /// <param name="item"></param>
         private void _BindRowData<T>(CellData cellData, List<ColumnAttributeData> rowAttributeDatas,T item)
         {
+            if (item == null) return;
             //找到当前列特性数据
             var _attributeData = rowAttributeDatas.FirstOrDefault(p => p._ColumnAttribute._Index == cellData._Column); 
-            if (_attributeData == null) return; 
-             var _data=  _attributeData._PropertyInfo.GetValue(item);
+            if (_attributeData == null) return;
+     
+            var _data=  _attributeData._PropertyInfo.GetValue(item);
             cellData._ShowData = _data;
             cellData._Data = item;
         }
