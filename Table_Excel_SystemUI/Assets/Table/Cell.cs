@@ -509,6 +509,7 @@ namespace XP.TableModel
             cellData = null;
             //_UpdatePos(); 
             _UpdateData();
+            _UpdatePos();
         }
         protected override void Start()
         {
