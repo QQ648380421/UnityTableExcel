@@ -136,24 +136,22 @@ namespace XP.TableModel
                 &&
                  p._CellData._Row >= _min.y && p._CellData._Row <= _max.y
                )
-                );
-         
-            Queue<Cell> _removeCellsQueue = new Queue<Cell>(_removeCells);
+                ).ToList(); 
 
             for (int x = 0; x < _xCellDatas.Count; x++)
             {
                 for (int y = 0; y < _yCellDatas.Count; y++)
                 {
-                    _SetCellData(_removeCellsQueue,_xCellDatas[x], _yCellDatas[y]);
+                    _SetCellData(_removeCells, _xCellDatas[x], _yCellDatas[y]);
                 }
-            }
-            for (int i = 0; i < _removeCellsQueue.Count; i++)
+            } 
+            for (int i = 0; i < _removeCells.Count; i++)
             {
-                var _removeCell= _removeCellsQueue.Dequeue();
+                var _removeCell= _removeCells[i]; 
                 if (_removeCell)
                 {
                     Destroy(_removeCell.gameObject);
-                }
+                } 
             }
 
 
@@ -165,20 +163,39 @@ namespace XP.TableModel
         /// </summary>
         /// <param name="column"></param>
         /// <param name="row"></param>
-        private void _SetCellData(Queue<Cell> removeCells,HeaderCellData column, HeaderCellData row)
+        private void _SetCellData(List<Cell> removeCells,HeaderCellData column, HeaderCellData row)
         {
             var _cell= _Cells.FirstOrDefault(p=>p._ColumnCellData== column && p._RowCellData==row);
             //缓存中还在，不用管
             if (_cell) {
-                _cell._ColumnCellData = column;
-                _cell._RowCellData = row;
-                _cell._Initialization();
+                bool flag = false;
+                if (_cell._ColumnCellData != column)
+                {
+                    _cell._ColumnCellData = column; 
+                    flag = true;
+                }
+                if (_cell._RowCellData != row)
+                {
+                    _cell._RowCellData = row;
+                    flag = true;
+                } 
+                var _data= _Table._CellDatas[column._Index,row._Index];
+                if (_data!= _cell._CellData)
+                {
+                    flag = true; 
+                }
+                if (flag)
+                {
+                    _cell._Initialization();
+                }
+                removeCells.Remove(_cell); 
                 return;
             }
             Cell cell=null;
             if (removeCells.Count>0)
             {
-                cell = removeCells.Dequeue();
+                cell = removeCells.FirstOrDefault();
+                removeCells.Remove(cell);
                 cell._ColumnCellData = column;
                 cell._RowCellData = row;
                 cell._Initialization();

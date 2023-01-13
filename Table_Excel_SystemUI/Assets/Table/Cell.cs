@@ -37,7 +37,7 @@ namespace XP.TableModel
             if (cellData != null && cellData._ShowData != null)
             {
                 dataStr = cellData._ShowData.ToString();
-            }
+            } 
             _CellDataChangedEvents_String?.Invoke(dataStr);
             _CellDataChangeEvent?.Invoke(this,cellData);
         }
@@ -331,8 +331,15 @@ namespace XP.TableModel
                 pos.x = _ColumnCell._RectTransform.anchoredPosition.x;  
                 size.x= _ColumnCell._RectTransform.sizeDelta.x;  
             }
-            _RectTransform.anchoredPosition = pos;
-            _RectTransform.sizeDelta = size;
+            if (_RectTransform.anchoredPosition != pos)
+            {
+                _RectTransform.anchoredPosition = pos;
+            }
+            if (_RectTransform.sizeDelta != size)
+            {
+                _RectTransform.sizeDelta = size;
+            }
+          
         }
          
         /// <summary>
@@ -364,9 +371,7 @@ namespace XP.TableModel
             _OnCellClickEvent -= Cell__OnCellClickEvent;
             _OnCellClickEvent += Cell__OnCellClickEvent;
             if (_Table)
-            {
-                _Table._HeaderColumn._OnRectSizeChangedEvent += _Header__OnRectSizeChangedEvent;
-                _Table._HeaderRow._OnRectSizeChangedEvent += _Header__OnRectSizeChangedEvent;
+            { 
                 _Table._OnRefreshEvent += _Table__OnRefreshEvent;
                 _Table._MultiSelectChangedEvent += _Table__MultiSelectChangedEvent;
                 _Table__MultiSelectChangedEvent(_Table, _Table._MultiSelect);
@@ -421,20 +426,14 @@ namespace XP.TableModel
         {
             this._OnCellClickEvent -= Cell__OnCellClickEvent;
             if (_Table)
-            {
-                _Table._HeaderRow._OnRectSizeChangedEvent -= _Header__OnRectSizeChangedEvent;
-                _Table._HeaderColumn._OnRectSizeChangedEvent -= _Header__OnRectSizeChangedEvent;
+            { 
                 _Table._OnRefreshEvent -= _Table__OnRefreshEvent;
                 _Table._MultiSelectChangedEvent -= _Table__MultiSelectChangedEvent;
             }
             this.onValueChanged.RemoveListener(_IsOnValueChanged); 
       
         }
-  
-        private void _Header__OnRectSizeChangedEvent()
-        {
-            _UpdatePos();
-        }
+   
 
         /// <summary>
         /// 单元格索引
@@ -508,7 +507,7 @@ namespace XP.TableModel
         /// </summary>
         public virtual  void _Initialization() {
             cellData = null;
-            _UpdatePos(); 
+            //_UpdatePos(); 
             _UpdateData();
         }
         protected override void Start()
@@ -519,20 +518,11 @@ namespace XP.TableModel
             _Initialization();
         }
 
-        //private void Update()
-        //{
-        //    if (!Application.isPlaying) return;
-        //    if (!_ColumnCell)
-        //    {
-        //        Destroy(gameObject);
-        //    }
-        //    else
-        //    if (!_RowCell)
-        //    {
-        //        Destroy(gameObject);
-        //    }
-        //}
-        
+        private void Update()
+        {
+            _UpdatePos(); 
+        }
+
         protected override void OnDestroy()
         {
             base.OnDestroy();
