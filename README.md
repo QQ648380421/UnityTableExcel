@@ -26,3 +26,5 @@ _Table._BindArray(_TestDatas);
 <p>测试过数据量50*500=25000的单元格，帧数稳定流畅<p/>
 
 ![](https://user-images.githubusercontent.com/40554493/210064241-52f87ccb-b049-4c7a-a73e-2aa53fd9ecae.png)
+
+有朋友反应说中文乱码，是因为TMP字体问题，制作一份中文TMP字体文件，然后修改表头单元格预制体中的字体即可
