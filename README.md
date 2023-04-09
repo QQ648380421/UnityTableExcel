@@ -2,7 +2,7 @@
 <p>在unity中非常简单的使用表格控件和Excel导入导出<p/>
 <p>使用教程：<p/>
 https://www.bilibili.com/video/BV1dW4y1K78B/?share_source=copy_web&vd_source=f31f50912390f999e135d9533323ad90
-演示效果：
+<p>演示效果：<p/>
 ![](https://raw.githubusercontent.com/QQ648380421/UnityTableExcel/master/%E6%BC%94%E7%A4%BA%E6%95%88%E6%9E%9C.gif)
 <pre><code>
 //创建数据类型
